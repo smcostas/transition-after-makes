@@ -1,0 +1,521 @@
+---
+title: "Pushing after the opponent scores barely matters, once you take the score out"
+subtitle: "NBA 2023-24 and 2024-25 · Bayesian hierarchical model in Stan · Santiago Costas, with Claude Opus 5.5 (high) as assistant for code, layout and writing style"
+toc-title: "Contents"
+---
+
+```{r}
+#| include: false
+here::i_am("report/index.qmd")
+source(here::here("report", "_common.R"))
+source(here("R", "derived.R"))
+
+tg_files <- c(all = "team_games.rds", close = "team_games_close.rds", q1 = "team_games_q1.rds")
+poss_per_game <- map_dbl(tg_files, ~ mean(read_rds(here("data", "processed", .x))$n_poss))
+win_slope <- mean(wins_per_point(results)$slope)
+share_fast_break <- mean(analysed$delta_s <= 8 & !analysed$dead_ball_first)
+```
+
+::: {.disclaimer}
+Independent analysis using public data, presented as an example case; not affiliated with the
+NBA or any of its teams. Reasoning behind every choice: [decision log](decisions.qmd). Full model:
+[formulation](formulation.qmd).
+:::
+
+<!-- DRAFT: Santiago to edit the callout and the conclusions. -->
+
+::: {.callout-tip}
+## For the staff
+
+- Pushing the ball after the opponent scores is a **style choice that neither costs nor wins
+  much**. In close games, playing a second faster than your usual pace goes with slightly
+  better possessions, but the gain is small and uncertain.
+- A naive look says the opposite (pushing hurts). That is likely, at least in part, the
+  **score talking**: teams that are behind speed up, so the bad nights are also the fast ones.
+- What separates teams is **what they do with these possessions**, not how fast they start
+  them. Every live-ball turnover hands the opponent a possession worth about 0.2 points more
+  than a made basket does.
+:::
+
+# The question
+
+After the opponent scores, a team can inbound and attack before the defense is set, or walk the
+ball up and run its half-court offense. Does pushing pay, once the cost of turnovers is counted,
+and does it pay more for some teams than for others?
+
+Every possession after an opponent's made field goal is measured by **the seconds of game clock
+until its first action** (shot, shooting foul or turnover; the inbound is included, because
+inbounding quickly is part of pushing) and by its **net points**: points scored minus the
+league-average value of the possession it hands to the opponent. A steal hands the opponent
+`r fmt(read_rds(here("data", "processed", "next_possession_values.rds")) %>% filter(start_type == "Off Steal") %>% pull(value) %>% mean(), 2)`
+points per possession; a made basket,
+`r fmt(read_rds(here("data", "processed", "next_possession_values.rds")) %>% filter(grepl("Make", start_type), start_type != "Off FT Make") %>% pull(value) %>% mean(), 2)`.
+
+# What the data show
+
+## Strict fast breaks are rare after a made basket
+
+```{r}
+#| label: fig-delta
+#| fig-cap: "Seconds of game clock from the opponent's made field goal to the first action. The dashed line is the FIBA fast-break limit (8 s)."
+#| fig-height: 4
+analysed %>%
+  filter(delta_s <= 30) %>%
+  ggplot(aes(delta_s)) +
+  geom_histogram(binwidth = 1, boundary = -0.5, fill = "grey70", colour = "white") +
+  geom_vline(xintercept = 8.5, linetype = "dashed", colour = accent) +
+  annotate("text", x = 8.8, y = Inf, vjust = 1.5, hjust = 0, size = 3.5, colour = accent,
+           label = paste0("Fast break (FIBA): ", scales::percent(share_fast_break, 1),
+                          " of possessions")) +
+  facet_wrap(~season) +
+  labs(x = "Seconds to first action after the opponent scores", y = "Possessions") +
+  theme_report()
+```
+
+Only `r scales::percent(share_fast_break, 1)` of these possessions are fast breaks in the FIBA
+sense. Pushing after a make usually ends in early offense, so intention is measured as a
+continuous pace, not as a count of fast breaks.
+
+## Teams have a pace identity after makes
+
+```{r}
+#| label: fig-team-pace
+#| fig-cap: "Average seconds to first action after the opponent scores, by team-season. Colour: overall pace (possessions per game, all situations)."
+#| fig-height: 7
+team_games %>%
+  group_by(season, team) %>%
+  summarise(pace_after_makes = weighted.mean(mean_delta, n_poss), .groups = "drop") %>%
+  left_join(pace, by = c("season", "team")) %>%
+  mutate(label = reorder(paste(team, season), -pace_after_makes)) %>%
+  ggplot(aes(pace_after_makes, label, colour = poss_per_game)) +
+  geom_point(size = 2.5) +
+  scale_colour_viridis_c(option = "plasma", end = 0.9, name = "Possessions per game") +
+  facet_wrap(~season, scales = "free_y") +
+  labs(x = "Seconds to first action after the opponent scores (lower = faster)", y = NULL) +
+  theme_report(10)
+```
+
+Usual paces span about four seconds across team-seasons, from about
+`r fmt(min(team_games %>% group_by(team_season) %>% summarise(x = weighted.mean(mean_delta, n_poss)) %>% pull(x)), 1)`
+to `r fmt(max(team_games %>% group_by(team_season) %>% summarise(x = weighted.mean(mean_delta, n_poss)) %>% pull(x)), 1)`
+seconds.
+Teams that push after makes tend to play fast overall too, but not always.
+
+## Teams stick to their pace from game to game
+
+```{r}
+#| label: fig-within-between
+#| fig-cap: "Average seconds to first action in each game (dots) for eight team-seasons of 2024-25, from the fastest to the slowest. Diamonds: season average."
+#| fig-height: 4.5
+sel <- team_games %>%
+  filter(season == "2024-25") %>%
+  group_by(team_season) %>%
+  summarise(avg = weighted.mean(mean_delta, n_poss)) %>%
+  arrange(avg) %>%
+  slice(round(seq(1, n(), length.out = 8)))
+team_games %>%
+  filter(team_season %in% sel$team_season) %>%
+  mutate(team_season = factor(team_season, levels = rev(sel$team_season))) %>%
+  ggplot(aes(mean_delta, team_season)) +
+  geom_jitter(height = 0.15, alpha = 0.35, size = 1.2, colour = "grey40") +
+  geom_point(aes(avg, team_season), data = sel %>%
+               mutate(team_season = factor(team_season, levels = rev(sel$team_season))),
+             shape = 23, size = 3.5, fill = accent, colour = "white", inherit.aes = FALSE) +
+  labs(x = "Average seconds to first action in the game", y = NULL) +
+  theme_report()
+```
+
+Part of the game-to-game scatter is noise from averaging about 30 possessions. Once the model
+separates it, a team's true pace moves about **`r fmt(hyper_value("all", "tau"), 2)` s** from
+game to game, while usual paces differ across teams by about
+**`r fmt(hyper_value("all", "sigma_m"), 2)` s**: roughly
+`r scales::percent(hyper_value("all", "sigma_m")^2 / (hyper_value("all", "sigma_m")^2 + hyper_value("all", "tau")^2), 1)`
+of the variation in a game's pace is who the team is.
+
+## The score moves the pace
+
+```{r}
+#| label: fig-score
+#| fig-cap: "Average seconds to first action by score margin when the possession starts (offense's point of view)."
+#| fig-height: 3.8
+analysed %>%
+  mutate(margin = cut(start_margin, c(-Inf, -10, -5, -1, 0, 4, 9, Inf),
+                      labels = c("Down 10+", "Down 5-9", "Down 1-4", "Tied",
+                                 "Up 1-4", "Up 5-9", "Up 10+"))) %>%
+  group_by(margin) %>%
+  summarise(delta = mean(delta_s), se = sd(delta_s) / sqrt(n())) %>%
+  ggplot(aes(margin, delta)) +
+  geom_pointrange(aes(ymin = delta - 2 * se, ymax = delta + 2 * se), colour = accent) +
+  labs(x = "Score margin at the start of the possession", y = "Seconds to first action") +
+  theme_report()
+```
+
+Teams behind push to catch up and teams ahead slow down. So a naive comparison mixes the choice
+to push with the score. The model is therefore fitted three times: on all possessions, on
+close games (quarters 1-3, within 5 points) and on first quarters, where the game starts tied.
+
+# Does pushing pay?
+
+The model compares each team **with itself**: in games where it plays faster than its own usual
+pace after makes, are those possessions better or worse? That is the **return**, in net points
+per 100 possessions per second faster.
+
+```{r}
+#| label: fig-three
+#| fig-cap: "Mean return across the league and the between-team association, in the three analyses. Median and 90% interval."
+#| fig-height: 3.6
+hyper_table %>%
+  filter(variable %in% c("beta_bar", "gamma")) %>%
+  mutate(analysis = factor(analysis_labels[analysis], levels = rev(analysis_labels)),
+         variable = recode(variable,
+                           beta_bar = "Return: a team playing faster than its own habit",
+                           gamma = "Between teams: habitually faster teams")) %>%
+  ggplot(aes(median, analysis)) +
+  geom_vline(xintercept = 0, colour = grey_line) +
+  geom_linerange(aes(xmin = q5, xmax = q95), linewidth = 1.1, colour = accent) +
+  geom_point(size = 3, colour = accent) +
+  facet_wrap(~variable) +
+  labs(x = "Net points per 100 possessions after makes, per second faster", y = NULL) +
+  theme_report()
+```
+
+```{r}
+#| label: tbl-three
+#| tbl-cap: "Mean return per second faster than the team's usual pace (net points per 100), with the posterior probability that it is positive."
+tibble(analysis = names(analysis_labels)) %>%
+  mutate(
+    Analysis = analysis_labels[analysis],
+    Possessions = analysis_detail[analysis],
+    `Mean return (90% interval)` = map_chr(analysis, fmt_interval, variable = "beta_bar",
+                                           digits = 2),
+    `P(return > 0)` = map_chr(fits[analysis], prob_positive, variable = "beta_bar")
+  ) %>%
+  select(-analysis) %>%
+  kable()
+```
+
+With all possessions, the return is slightly negative. In close games and first quarters, where
+the score has little say, the sign flips to slightly positive, with intervals that still include
+zero. Pushing does not hurt when the game is even; it may help a little.
+
+## Is it different for some teams?
+
+```{r}
+#| label: fig-team-returns
+#| fig-cap: "Return of each team-season in the three analyses (median and 80% interval). Intervals overlap almost completely."
+#| fig-height: 11
+imap_dfr(fits, return_table) %>%
+  mutate(analysis = factor(analysis_labels[analysis], levels = analysis_labels),
+         team_season = reorder(team_season, med)) %>%
+  ggplot(aes(med, team_season, colour = analysis)) +
+  geom_vline(xintercept = 0, colour = grey_line) +
+  geom_linerange(aes(xmin = lo, xmax = hi), position = position_dodge(width = 0.7)) +
+  geom_point(position = position_dodge(width = 0.7), size = 1.2) +
+  scale_colour_manual(values = c("grey55", accent, "#d95f02"), name = NULL) +
+  facet_wrap(~season, scales = "free_y") +
+  labs(x = "Return: net points per 100 per second faster than usual", y = NULL) +
+  theme_report(9)
+```
+
+No team-season's return can be told apart from the league value: estimates are pulled towards
+a common value and their intervals overlap. This is not proof that returns are identical; the
+data cannot say how much they really vary (in close games the spread across teams, sigma_beta,
+has a 90% interval of `r fmt(hyper_value("close", "sigma_beta", "q5"), 1)` to
+`r fmt(hyper_value("close", "sigma_beta", "q95"), 1)` net points per 100 per second).
+
+## How big is it?
+
+```{r}
+#| label: tbl-size
+#| tbl-cap: "The mean return in game terms. A typical game moves about tau seconds away from the team's usual pace."
+tibble(analysis = names(analysis_labels)) %>%
+  mutate(
+    beta = map_dbl(analysis, hyper_value, variable = "beta_bar"),
+    tau = map_dbl(analysis, hyper_value, variable = "tau"),
+    n = poss_per_game[analysis],
+    `Analysis` = analysis_labels[analysis],
+    `Return (per 100, per second)` = fmt(beta),
+    `Typical game-to-game change in pace (s)` = fmt(tau, 2),
+    `Net points per game in a typical game` = fmt(beta / 100 * n * tau, 2),
+    `Wins if played 1 s faster all season (extrapolation)` =
+      fmt(beta / 100 * n * 82 * win_slope, 1)
+  ) %>%
+  select(-analysis, -beta, -tau, -n) %>%
+  kable()
+```
+
+Even in close games the effect is a fraction of a point per game. The last column (posterior
+median, wins per point of margin averaged over the two seasons) extrapolates beyond what teams
+actually do, a whole second faster every game, and is shown only to give a sense of scale.
+
+# Who pushes, and how it goes
+
+```{r}
+#| label: fig-quadrants
+#| fig-cap: !expr 'paste0("Close games. Horizontal: usual seconds to first action after the opponent scores (faster to the right). Vertical: ", level_name, " (median and 80% interval). Halo colour: overall pace. Circled and labelled: team-seasons the model names (level interval at 95% and pace side with probability 0.9 or more).")'
+#| fig-height: 6.5
+#| fig-width: 11
+lev <- level_table(fits$close)
+meds <- lev %>% group_by(season) %>% summarise(med_intent = median(intent))
+corners <- lev %>%
+  group_by(season) %>%
+  reframe(x = c(max(intent), max(intent), min(intent), min(intent)),
+          y = c(max(hi), min(lo), max(hi), min(lo)),
+          hjust = c(0, 0, 1, 1),
+          text = c("Slow, does well", "Slow, does badly", "Fast, does well", "Fast, does badly"))
+ggplot(lev, aes(intent, med)) +
+  geom_hline(yintercept = 0, colour = grey_line) +
+  geom_vline(aes(xintercept = med_intent), data = meds, colour = grey_line) +
+  geom_linerange(aes(ymin = lo, ymax = hi, colour = poss_per_game), alpha = 0.7,
+                 linewidth = 0.8) +
+  geom_point(aes(colour = poss_per_game), size = 7.5, alpha = 0.35) +
+  geom_point(data = filter(lev, named), shape = 21, size = 8.5, stroke = 1.1,
+             colour = "black") +
+  nbaplotR::geom_nba_logos(aes(team_abbr = nbaplotR::clean_team_abbrs(team)),
+                           width = 0.032) +
+  geom_text_repel(aes(label = team), data = filter(lev, named), fontface = "bold",
+                  size = 3.2, colour = "grey15", nudge_y = 1.6, seed = 1) +
+  geom_text(aes(x, y, label = text, hjust = hjust), data = corners, size = 3.2,
+            colour = "grey45", fontface = "italic", vjust = 0) +
+  scale_x_reverse() +
+  scale_colour_viridis_c(option = "plasma", end = 0.9, name = "Possessions per game") +
+  facet_wrap(~season) +
+  labs(x = "Usual seconds to first action after the opponent scores (faster to the right)",
+       y = paste0(level_name, "\n(net points per 100 vs league)")) +
+  theme_report(11)
+```
+
+::: {.column-margin}
+**`r level_name`**: points scored minus the league-average value of the possession handed to the
+opponent, per 100 possessions after an opponent's made field goal, relative to the league and
+adjusted for opponent and home court. Defense is not included.
+:::
+
+```{r}
+#| include: false
+role_text <- c(fast_good = "fast and good", slow_good = "slow and good",
+               fast_bad = "fast and poor", slow_bad = "slow and poor")
+named_close <- fits$close$named_95 %>% filter(role %in% names(role_text))
+named_sentence <- paste0(role_text[named_close$role], " (", named_close$team_season, ")",
+                         collapse = "; ")
+seasons_named <- unique(named_close$season)
+```
+
+The model names a team-season only when both its offense and its pace are clearly on one side.
+In close games that happens for `r named_sentence`. In
+`r paste(setdiff(c("2023-24", "2024-25"), seasons_named), collapse = " and ")` no team-season
+passes both conditions. Across teams, a faster usual pace goes with
+a slightly better offense in close games (`r fmt_interval("close", "gamma", 2)` net points per
+100 per second; probability positive `r prob_positive(fits$close, "gamma")`), weak and exposed
+to talent: good teams may push because they are good.
+
+# Conclusions
+
+<!-- DRAFT: Santiago to edit. -->
+
+1. **The naive analysis misleads.** Over all possessions, playing faster than your habit goes
+   with slightly worse possessions. Teams behind speed up to catch up, which can produce that
+   association on its own; the close-game and first-quarter results are consistent with this,
+   though they also differ in which possessions they use.
+2. **Without the score, the sign flips.** In close games and first quarters, playing faster than
+   your habit goes with a small advantage. The evidence is moderate, but it makes a large
+   cost of pushing unlikely when the score does not force it.
+3. **No team stands out in the return to playing faster than its own habit.** No team-season's
+   return can be told apart from the league value; the data cannot tell how much returns really
+   vary across teams. Teams do differ, and a lot, in how well they attack after the opponent scores (see the
+   quadrants); they do not differ in what an extra second of speed is worth to them.
+4. **Usual pace does not decide how well these possessions go.** Fast and slow teams can both be
+   good; what separates them is the quality of the possession, not its speed.
+5. **The size is small in game terms**: a fraction of a point per game. Home court matters more
+   (about `r fmt(hyper_value("close", "h"), 1)` net points per 100).
+6. **For the staff:** pushing after makes is neither a recipe nor a mistake. The useful question
+   is how and with whom, which is the next layer of this project.
+
+# Limitations
+
+- **Observational data.** The return compares each team with itself, which removes what is fixed
+  for a team within a season, but not what changes from game to game: lineups, injuries, rest.
+  A missing star can change both the pace and the result.
+- **The score is reduced, not removed.** Close games and first quarters limit its influence; the
+  score at each possession still reflects earlier possessions.
+- **Pace is measured from play-by-play.** The inbound and a push that the defense stops are not
+  observed separately; timestamps have one-second resolution.
+- **Two seasons, two public dumps.** 2025-26 is not in the possession data used here; adding it
+  is the first planned update.
+- **Garbage time** follows the Cleaning the Glass margin rule without its starters condition (no
+  lineup data).
+
+# Methods
+
+::: {.panel-tabset}
+
+## Model
+
+Two submodels fitted jointly in Stan ([full formulation](formulation.qmd)):
+
+- **Pace**: each team-game's average seconds to first action measures, with known error, a
+  latent true pace; true paces vary around the team-season's usual pace.
+- **Outcome**: net points per 100 of each team-game, normal with a spread that shrinks with the
+  number of possessions; expected value = season average + team-season level + return x
+  (seconds faster than usual) + opponent + home.
+
+Team-season levels, returns and opponent effects are partially pooled. Population parameters
+are shared by the two seasons; everything else is season-specific.
+
+## Diagnostics
+
+```{r}
+#| label: tbl-diagnostics
+imap_dfr(fits, function(f, name) {
+  tibble(
+    Analysis = analysis_labels[name],
+    `Divergent transitions` = sum(f$diagnostics$num_divergent),
+    `Max R-hat` = fmt(max(f$hyper$rhat), 3),
+    `Min ESS (bulk)` = round(min(f$hyper$ess_bulk))
+  )
+}) %>%
+  kable()
+```
+
+Posterior predictive checks, DHARMa residuals, trace and rank plots are produced by
+`scripts/05_model_partial_pooling.R`.
+
+## Fit checks
+
+If the model describes the data well, data simulated from it should look like the real data.
+Two checks, for the main analysis (close games) and for all possessions:
+
+- **Posterior predictive checks**: the dark line is the observed distribution across team-games;
+  the light lines are 50 datasets simulated from the posterior. They should overlap.
+- **DHARMa residuals**: each observation is placed within its own simulated distribution. With a
+  good model these quantiles are uniform: points on the diagonal of the QQ plot, and flat
+  residuals against predictions and against pace.
+
+```{r}
+#| include: false
+fig_src <- here("output", "figures")
+fig_dst <- here("report", "figures")
+dir.create(fig_dst, showWarnings = FALSE)
+invisible(file.copy(list.files(fig_src, full.names = TRUE), fig_dst, overwrite = TRUE))
+```
+
+::: {.panel-tabset}
+
+### Close games
+
+```{r}
+#| layout-ncol: 2
+#| fig-cap:
+#|   - "Net points per 100: observed (dark) and simulated (light)."
+#|   - "Average seconds to first action: observed and simulated."
+include_graphics(c("figures/close_ppc_y.png", "figures/close_ppc_dbar.png"))
+```
+
+```{r}
+#| fig-cap: "DHARMa residuals of net points per 100."
+include_graphics("figures/close_dharma.png")
+```
+
+### All possessions
+
+```{r}
+#| layout-ncol: 2
+#| fig-cap:
+#|   - "Net points per 100: observed (dark) and simulated (light)."
+#|   - "Average seconds to first action: observed and simulated."
+include_graphics(c("figures/all_ppc_y.png", "figures/all_ppc_dbar.png"))
+```
+
+```{r}
+#| fig-cap: "DHARMa residuals of net points per 100."
+include_graphics("figures/all_dharma.png")
+```
+
+:::
+
+## Priors
+
+Priors are weakly informative and centred at zero for every slope, so they do not say whether
+pushing pays. Their scales come from the descriptive data; the only informative one is the
+spread of a single possession's net points, which is observed directly. Simulating games from
+the priors alone gives plausible paces and scores
+([prior predictive check](formulation.qmd#sec-priors)). After seeing the data, the posteriors
+are much narrower than the priors: the data, not the priors, drive the results.
+
+```{r}
+#| label: fig-prior-posterior
+#| fig-cap: "Prior (purple) and posterior (orange) of the population-level parameters. Close games."
+#| fig-height: 5
+source(here("R", "priors.R"))
+set.seed(11)
+draws <- fits$close$hyper_draws
+n_draw <- nrow(draws)
+draw_prior <- function(name) {
+  row <- priors[priors$parameter == name, ]
+  switch(row$family,
+         normal = rnorm(n_draw, row$p1, row$p2),
+         exponential = rexp(n_draw, row$p1),
+         abs(rnorm(n_draw, row$p1, row$p2)))
+}
+params <- c(beta_bar = "beta_bar", gamma = "gamma", sigma_beta = "sigma_beta",
+            sigma_a = "sigma_a", tau = "tau", h = "h")
+labels <- c(beta_bar = "Mean return", gamma = "Between teams", sigma_beta = "Spread of returns",
+            sigma_a = "Spread of offenses", tau = "Game-to-game pace (s)", h = "Home court")
+imap_dfr(params, function(prior_name, param) {
+  bind_rows(
+    tibble(param = param, value = as.numeric(draws[[param]]), type = "Posterior"),
+    tibble(param = param, value = draw_prior(prior_name), type = "Prior")
+  )
+}) %>%
+  mutate(param = factor(labels[param], levels = labels),
+         type = factor(type, levels = c("Prior", "Posterior"))) %>%
+  ggplot(aes(value, fill = type, colour = type)) +
+  geom_density(alpha = 0.4, adjust = 2) +
+  scale_fill_manual(values = c(Prior = "#3B0F70", Posterior = "#FE9F6D"), name = NULL) +
+  scale_colour_manual(values = c(Prior = "#3B0F70", Posterior = "#FE9F6D"), name = NULL) +
+  facet_wrap(~param, scales = "free") +
+  labs(x = NULL, y = "Density") +
+  theme_report(10)
+```
+
+## Why pool
+
+Fitting each team-season on its own (no pooling) gives returns from about -7 to +5; partial
+pooling pulls them towards the league value, because most of that spread is noise from 82 noisy
+games. Leave-one-out cross-validation prefers partial pooling.
+
+```{r}
+#| label: fig-shrinkage
+#| fig-cap: "Return of each team-season: no pooling (grey dot) and partial pooling (arrow tip). All possessions."
+#| fig-height: 7
+fits$all$shrink %>%
+  mutate(team_season = reorder(team_season, no_pooling)) %>%
+  ggplot(aes(y = team_season)) +
+  geom_vline(xintercept = hyper_value("all", "beta_bar"), colour = grey_line,
+             linetype = "dashed") +
+  geom_segment(aes(x = no_pooling, xend = partial_pooling, yend = team_season),
+               arrow = arrow(length = unit(0.12, "cm")), colour = "grey40") +
+  geom_point(aes(x = no_pooling), colour = "grey70") +
+  facet_wrap(~season, scales = "free_y") +
+  labs(x = "Return (median); dashed: league mean return", y = NULL) +
+  theme_report(9)
+```
+
+```{r}
+#| label: tbl-loo
+loo::loo_compare(list(`No pooling` = m1$loo, `Partial pooling` = fits$all$loo)) %>%
+  as.data.frame() %>%
+  rownames_to_column("Model") %>%
+  transmute(Model, `ELPD difference` = fmt(elpd_diff), SE = fmt(se_diff)) %>%
+  kable()
+```
+
+## Data and code
+
+Play-by-play and possession data from the public dumps in
+[shufinskiy/nba_data](https://github.com/shufinskiy/nba_data), regular seasons 2023-24 and
+2024-25. Validation of the sources: [data notes](data-notes.qmd). Every definition and
+exclusion, with the evidence behind it: [decision log](decisions.qmd). Code, tests and the
+order to run the scripts: [repository](https://github.com/smcostas/transition-after-makes).
+
+:::

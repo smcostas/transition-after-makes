@@ -1,0 +1,293 @@
+---
+title: "Decision log"
+subtitle: "How the analysis was defined, and the evidence behind each choice"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    theme: cosmo
+    code-fold: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+here::i_am("report/decisions.qmd")
+library(here)
+library(tidyverse)
+library(knitr)
+
+universe <- read_rds(here("data", "processed", "universe.rds"))
+pct <- function(x, d = 1) scales::percent(x, accuracy = 10^-d)
+
+# Possessions kept by every rule except the one a section is about
+not_garbage_or_last2 <- universe %>% filter(!excl_last2min, !excl_garbage, !is.na(net_points))
+analysed <- universe %>% filter(!excluded, !is.na(net_points))
+```
+
+Every definition in this project was a choice. This log records each one: the question, the
+options, the evidence, and where the decision came from. **Basketball** marks decisions that came
+from how the game is played; **Statistics** marks decisions driven by the data or the model. All
+numbers below are computed from the data when this page is rendered (NBA regular seasons 2023-24
+and 2024-25); see [Data notes](data-notes.qmd) for the validation of the raw sources.
+
+# What counts as "pushing after a make"
+
+## Only possessions after a made field goal, not after a made free throw
+
+*Origin: rules.* After a made field goal the game clock keeps running during the inbound; after a
+free throw it is stopped until the inbound is touched (NBA Rule 5). Time to the first action
+would include the inbound in one case and not in the other, so only made field goals are used.
+
+## Intention is a continuous pace, not a fast-break count
+
+*Origin: Basketball, confirmed by the data.* The first definition was the FIBA fast-break rule
+(first action within 8 s). It turned out to describe a fast break, not the decision to push: a
+team that pushes after a make usually ends in early offense, around 8–12 s, and a push that the
+defense stops looks like any long possession.
+
+```{r}
+#| label: tbl-fastbreak
+#| tbl-cap: "Share of possessions after a made field goal by time to first action"
+analysed %>%
+  group_by(Season = season) %>%
+  summarise(
+    `Δ ≤ 8 s (FIBA fast break)` = pct(mean(delta_s <= 8)),
+    `Δ ≤ 12 s` = pct(mean(delta_s <= 12)),
+    `Median Δ (s)` = median(delta_s)
+  ) %>%
+  kable()
+```
+
+```{r}
+#| label: tbl-team-range
+#| tbl-cap: "Team-seasons differ by about 4 seconds in their average pace after makes"
+analysed %>%
+  group_by(season, team) %>%
+  summarise(mean_delta = mean(delta_s), le12 = mean(delta_s <= 12), .groups = "drop") %>%
+  group_by(Season = season) %>%
+  summarise(
+    Fastest = team[which.min(mean_delta)],
+    `Fastest Δ (s)` = round(min(mean_delta), 1),
+    Slowest = team[which.max(mean_delta)],
+    `Slowest Δ (s)` = round(max(mean_delta), 1),
+    `Range of share Δ ≤ 12 s` = paste(pct(min(le12), 0), "to", pct(max(le12), 0))
+  ) %>%
+  kable()
+```
+
+With only about 5% of possessions as strict fast breaks, a per-game fast-break rate would rest
+on about two possessions. The average time to the first action uses every possession and
+separates teams clearly. Decision: intention is the team-game average time to the first action,
+with no cut-off fixed in advance.
+
+## The inbound is part of pushing
+
+*Origin: Basketball.* The moment the ball is touched in bounds is not in any public data, so the
+inbound cannot be removed. It should not be: inbounding quickly is part of pushing. The part
+every team takes is a constant that cancels out of the within-team comparison.
+
+## Time to first action, not possession length
+
+*Origin: Statistics.* Possession length is also available, but it grows with offensive rebounds
+and ends at the defensive rebound after a miss, which is sometimes logged late. It is kept as a
+robustness check.
+
+# When the clock, not the team, sets the pace
+
+## The last 54 seconds of quarters 1–3 are excluded
+
+*Origin: Basketball, confirmed by the data.* Near the end of a quarter, teams shoot early to get
+a 2-for-1, hold for the last shot, or heave. Time to the first action then reflects the clock,
+not a choice to push.
+
+```{r}
+#| label: tbl-end-quarter
+#| tbl-cap: "Quarters 1-3: possessions that start in the last 54 seconds against the rest"
+not_garbage_or_last2 %>%
+  filter(period <= 3) %>%
+  mutate(Window = if_else(start_s <= 54, "Last 54 s of the quarter", "Rest of the quarter")) %>%
+  group_by(Window) %>%
+  summarise(
+    Possessions = n(),
+    `Mean Δ (s)` = round(mean(delta_s), 1),
+    `Fast breaks (Δ ≤ 8 s)` = pct(mean(delta_s <= 8))
+  ) %>%
+  kable()
+```
+
+## The last 2:00 of the 4th quarter and of overtime are excluded
+
+*Origin: rules.* The game clock stops after made baskets there, so the inbound is no longer
+inside the time to the first action.
+
+## Garbage time follows Cleaning the Glass, without the starters condition
+
+*Origin: Statistics.* The margin thresholds of Cleaning the Glass are applied (4th quarter only:
+25, 20 and 10 points by time left). Its second condition, two or fewer starters on the floor,
+cannot be applied because the data have no lineups, so slightly more possessions are excluded.
+
+# Separating the score from the choice to push
+
+## Three analyses: full, close and first quarter
+
+*Origin: Basketball.* Teams behind push to catch up and teams ahead slow down, so the score can
+drive pace. The same model is fitted on all possessions, on close possessions, and on first
+quarters only, where the game starts tied and the plan is not yet shaped by the score.
+
+## The score moves the pace, inside every team
+
+*Origin: Basketball, confirmed by the data.* The first fit of the main model, on all
+possessions, gave a small negative return: in games where a team played faster than usual after
+makes, those possessions went slightly worse. Teams that are behind speed up to catch up, so the
+games that go badly are also the faster ones. That alone can produce a negative association.
+
+```{r}
+#| label: tbl-pace-by-score
+#| tbl-cap: "Mean seconds to first action by score margin when the possession starts"
+analysed %>%
+  mutate(`Margin at the start` = cut(
+    start_margin, c(-Inf, -10, -5, -1, 0, 4, 9, Inf),
+    labels = c("Down 10+", "Down 5-9", "Down 1-4", "Tied", "Up 1-4", "Up 5-9", "Up 10+")
+  )) %>%
+  group_by(`Margin at the start`) %>%
+  summarise(Possessions = n(), `Mean Δ (s)` = round(mean(delta_s), 1)) %>%
+  kable()
+```
+
+```{r}
+#| label: tbl-within-score
+#| tbl-cap: "Within each team-season: games played faster than usual are games with a worse score"
+within_tg <- analysed %>%
+  group_by(season, game_id, team) %>%
+  summarise(mean_delta = mean(delta_s), mean_margin = mean(start_margin), .groups = "drop") %>%
+  group_by(season, team) %>%
+  mutate(faster_than_usual = mean(mean_delta) - mean_delta,
+         margin_dev = mean_margin - mean(mean_margin)) %>%
+  summarise(r = cor(faster_than_usual, margin_dev), .groups = "drop")
+within_tg %>%
+  summarise(
+    `Team-seasons` = n(),
+    `Median correlation` = round(median(r), 2),
+    `Team-seasons with a negative correlation` = sum(r < 0)
+  ) %>%
+  kable()
+```
+
+The correlation cannot separate "behind, so faster" from "faster, it went wrong, so behind":
+the margin at each possession already includes the earlier possessions. That is why the model
+is also fitted on close possessions and on first quarters, where the score has had little time
+to build up.
+
+## "Close" means within 5 points, in quarters 1–3
+
+*Origin: Basketball, confirmed by the data.* Close games are played slower near the end, long
+before the last two minutes.
+
+```{r}
+#| label: tbl-close-segment
+#| tbl-cap: "Possessions that start within 5 points, by segment of the game"
+analysed %>%
+  filter(abs(start_margin) <= 5) %>%
+  mutate(Segment = case_when(
+    period <= 3 ~ "Quarters 1-3",
+    period == 4 & start_s > 360 ~ "4th quarter, 12:00-6:00",
+    period == 4 ~ "4th quarter, 6:00-2:00",
+    TRUE ~ "Overtime"
+  )) %>%
+  group_by(Segment) %>%
+  summarise(
+    Possessions = n(),
+    `Mean Δ (s)` = round(mean(delta_s), 1),
+    `Fast breaks (Δ ≤ 8 s)` = pct(mean(delta_s <= 8))
+  ) %>%
+  arrange(`Mean Δ (s)`) %>%
+  kable()
+```
+
+Keeping the 4th quarter would make a game look slow partly because it was close at the end.
+"Close" is measured at the start of each possession, never by the final result: selecting games
+by how they ended would condition on the outcome.
+
+# What a possession is worth
+
+## Net points: the cost of how a possession ends
+
+*Origin: Basketball and Statistics.* A turnover costs more than the points not scored: it hands
+the opponent a better possession. Each possession is charged with the value of the opponent's
+next possession, estimated within the same season.
+
+```{r}
+#| label: tbl-next-value
+#| tbl-cap: "Points per possession, by how the possession started (all possessions of each season)"
+read_rds(here("data", "processed", "next_possession_values.rds")) %>%
+  mutate(`Opponent's possession starts after our...` = case_when(
+    str_detect(start_type, "Make") & start_type != "Off FT Make" ~ "made field goal",
+    start_type == "Off Steal" ~ "live-ball turnover (steal)",
+    start_type == "Off Dead Ball" ~ "dead ball (incl. dead-ball turnover)",
+    str_detect(start_type, "Miss|Block") & start_type != "Off FT Miss" ~ "missed shot",
+    TRUE ~ NA_character_
+  )) %>%
+  filter(!is.na(`Opponent's possession starts after our...`)) %>%
+  group_by(`Opponent's possession starts after our...`, season) %>%
+  summarise(value = round(mean(value), 2), .groups = "drop") %>%
+  pivot_wider(names_from = season, values_from = value) %>%
+  kable()
+```
+
+A live-ball turnover hands the opponent about 0.2 points more than a made basket does. That is the
+cost the net points charge.
+
+# Measuring intention with error
+
+## The game's average pace is a noisy measurement
+
+*Origin: Statistics.* A team-game has about 30 possessions after a made basket, and time to the
+first action varies a lot within a game. Its average is therefore measured with error.
+
+```{r}
+#| label: tbl-reliability
+#| tbl-cap: "How much of the game-to-game variation in pace is measurement noise"
+tg <- analysed %>%
+  group_by(season, game_id, team) %>%
+  summarise(n = n(), mean_delta = mean(delta_s), sd_delta = sd(delta_s), .groups = "drop")
+tg %>%
+  group_by(Season = season) %>%
+  summarise(
+    `Possessions per team-game` = round(mean(n), 1),
+    `Within-game SD of Δ (s)` = round(mean(sd_delta, na.rm = TRUE), 2),
+    `Standard error of a game's mean (s)` = round(mean(sd_delta / sqrt(n), na.rm = TRUE), 2),
+    `SD of game means (s)` = round(sd(mean_delta), 2)
+  ) %>%
+  mutate(`Share of variance that is noise` =
+           pct(`Standard error of a game's mean (s)`^2 / `SD of game means (s)`^2, 0)) %>%
+  kable()
+```
+
+Using the observed average directly as a predictor would bias the estimated return towards
+zero. Decision: the true pace of each game is a latent parameter, measured by the observed
+average with this known error.
+
+## Team-game likelihood
+
+*Origin: Statistics.* Net points per 100 of a team-game are an average of about 30 possessions,
+close to normal by the central limit theorem, with a spread that shrinks with the number of
+possessions. A possession-level model is a planned extension.
+
+# Seasons
+
+## Every quantity is paired with its own season
+
+*Origin: Basketball.* Rosters and coaches change between seasons and within them. The unit is
+the team-season, and no number from one season is used to describe or adjust another.
+
+## 2025-26 is descriptive only in this version
+
+*Origin: data availability.* Possession-level data for 2025-26 are not in the public dump used
+here. The season of Miami's change of pace after Jimmy Butler's departure is described with
+team totals from pbpstats.com; adding it to the model needs a possession parser for the new
+play-by-play format, planned as the first update.

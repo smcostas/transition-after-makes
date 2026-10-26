@@ -1,0 +1,40 @@
+project:
+  type: website
+  output-dir: ../docs
+  render:
+    - index.qmd
+    - decisions.qmd
+    - formulation.qmd
+    - data-notes.qmd
+
+website:
+  title: "Pushing after the opponent scores"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Report
+      - href: decisions.qmd
+        text: Decision log
+      - href: formulation.qmd
+        text: Model formulation
+      - href: data-notes.qmd
+        text: Data notes
+    right:
+      - icon: github
+        href: https://github.com/smcostas/transition-after-makes
+  page-footer:
+    center: "Independent analysis using public data, presented as an example case; not affiliated with the NBA or any of its teams."
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+    code-fold: true
+    fig-align: center
+
+execute:
+  echo: false
+  warning: false
+  message: false
+  freeze: false

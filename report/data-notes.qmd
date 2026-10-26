@@ -1,0 +1,186 @@
+---
+title: "Data validation notes"
+date: today
+format:
+  html:
+    theme: cosmo
+    code-fold: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+here::i_am("report/data-notes.qmd")
+library(here)
+library(tidyverse)
+
+secs <- function(x) {
+  m <- str_split_fixed(x, ":", 2)
+  as.numeric(m[, 1]) * 60 + as.numeric(m[, 2])
+}
+make_types <- c("Off At Rim Make", "Off Arc 3 Make", "Off Short Mid-Range Make",
+                "Off Long Mid-Range Make", "Off Corner 3 Make")
+
+check_season <- function(season) {
+  raw <- read_csv(here("data", "raw", paste0("pbpstats_", season, ".csv")),
+                  col_types = cols(.default = "c"))
+  poss <- raw %>%
+    distinct(GAMEID, PERIOD, STARTTIME, ENDTIME, OPPONENT, STARTTYPE,
+             STARTSCOREDIFFERENTIAL, FG2M, FG3M, SHOOTINGFOULSDRAWN,
+             NONSHOOTINGFOULSTHATRESULTEDINFTS) %>%
+    mutate(across(c(GAMEID, PERIOD, STARTSCOREDIFFERENTIAL, FG2M, FG3M, SHOOTINGFOULSDRAWN,
+                    NONSHOOTINGFOULSTHATRESULTEDINFTS), as.numeric),
+           start_s = secs(STARTTIME), end_s = secs(ENDTIME)) %>%
+    arrange(GAMEID, PERIOD, desc(start_s), desc(end_s)) %>%
+    group_by(GAMEID) %>%
+    mutate(next_opp = lead(OPPONENT), next_diff = lead(STARTSCOREDIFFERENTIAL)) %>%
+    ungroup()
+
+  # Points from the change in score differential between consecutive possessions,
+  # checked against made field goals on possessions without free throws.
+  alt <- poss %>% filter(next_opp != OPPONENT)
+  no_ft <- alt %>% filter(SHOOTINGFOULSDRAWN == 0, NONSHOOTINGFOULSTHATRESULTEDINFTS == 0)
+  pts_match <- mean(-no_ft$next_diff - no_ft$STARTSCOREDIFFERENTIAL ==
+                      2 * no_ft$FG2M + 3 * no_ft$FG3M, na.rm = TRUE)
+
+  # Offense team: the other team of the game.
+  teams <- poss %>% distinct(GAMEID, OPPONENT) %>%
+    group_by(GAMEID) %>% mutate(offense = rev(OPPONENT)) %>% ungroup()
+  mk <- poss %>% filter(STARTTYPE %in% make_types) %>%
+    left_join(teams, by = c("GAMEID", "OPPONENT")) %>%
+    mutate(pid = row_number())
+
+  ev <- read_csv(here("data", "raw", paste0("nbastats_", season, ".csv")),
+                 col_types = cols(.default = "c")) %>%
+    transmute(GAMEID = as.numeric(GAME_ID), PERIOD = as.numeric(PERIOD),
+              EVENTNUM = as.numeric(EVENTNUM), type = as.numeric(EVENTMSGTYPE),
+              act = as.numeric(EVENTMSGACTIONTYPE), t_s = secs(PCTIMESTRING),
+              team1 = PLAYER1_TEAM_ABBREVIATION)
+
+  win <- mk %>%
+    inner_join(ev, by = c("GAMEID", "PERIOD"), relationship = "many-to-many") %>%
+    filter(t_s <= start_s, t_s >= end_s)
+  first <- win %>%
+    filter((type %in% c(1, 2) & team1 == offense) |
+             (type == 5 & (team1 == offense | is.na(team1))) |
+             (type == 6 & act %in% c(2, 29) & team1 == OPPONENT)) %>%
+    group_by(pid) %>% slice_min(EVENTNUM, n = 1) %>% ungroup() %>%
+    transmute(pid, first_t = t_s, first_ev = EVENTNUM)
+  dead <- win %>% inner_join(first, by = "pid") %>%
+    filter(EVENTNUM < first_ev, type %in% c(6, 7, 8, 9, 10, 18),
+           !(type == 6 & act %in% c(2, 29))) %>%
+    distinct(pid) %>% mutate(dead_ball = TRUE)
+
+  mk <- mk %>% left_join(first, by = "pid") %>% left_join(dead, by = "pid") %>%
+    mutate(delta = start_s - first_t, dead_ball = coalesce(dead_ball, FALSE),
+           season = paste0(season, "-", substr(season + 1, 3, 4)))
+
+  list(
+    checks = tibble(
+      season = unique(mk$season),
+      games = n_distinct(poss$GAMEID),
+      possessions = nrow(poss),
+      alternation = mean(poss$next_opp != poss$OPPONENT, na.rm = TRUE),
+      points_match = pts_match,
+      after_make = nrow(mk),
+      first_action_found = mean(!is.na(mk$delta)),
+      dead_ball_first = mean(mk$dead_ball),
+      median_delta = median(mk$delta, na.rm = TRUE),
+      le6 = mean(mk$delta <= 6 & !mk$dead_ball, na.rm = TRUE),
+      le8 = mean(mk$delta <= 8 & !mk$dead_ball, na.rm = TRUE),
+      le9 = mean(mk$delta <= 9 & !mk$dead_ball, na.rm = TRUE)
+    ),
+    mk = mk
+  )
+}
+
+res <- map(c(2023, 2024), check_season)
+checks <- map_dfr(res, "checks")
+mk <- map_dfr(res, "mk")
+```
+
+Exploratory check of the two raw sources before writing the tested functions (Task 3). Raw data:
+`shufinskiy/nba_data`, `pbpstats` (one row per video event inside a possession) and `nbastats`
+(one row per play-by-play event).
+
+## What the data contain
+
+* `pbpstats` has **no offense column**, only `OPPONENT` (the defense). The offense is the other
+  team of the game.
+* Rows are events, not possessions: possessions are recovered with `distinct()`.
+* Clocks are text, minutes:seconds remaining in the period, as `MM:SS` in `pbpstats` and `M:SS`
+  in `nbastats`.
+* There is no free-throw column. **Points** come from the change in score differential between
+  a possession and the next one.
+* Possessions have start and end times but **no time of the first action**. $\Delta$ comes from
+  joining the `nbastats` events inside the possession's time window: the first field-goal attempt
+  or turnover by the offense, or shooting foul by the defense.
+* Start types of possessions after a made field goal are split by zone: `Off At Rim Make`,
+  `Off Arc 3 Make`, `Off Corner 3 Make`, `Off Short Mid-Range Make`, `Off Long Mid-Range Make`.
+
+## Checks
+
+```{r}
+#| label: tbl-checks
+#| tbl-cap: "Validation checks by season (before exclusions)"
+checks %>%
+  transmute(
+    Season = season, Games = games, Possessions = possessions,
+    `Next possession is the other team` = scales::percent(alternation, 0.1),
+    `Points agree with made FG (no FTs)` = scales::percent(points_match, 0.1),
+    `After opponent made FG` = after_make,
+    `First action found` = scales::percent(first_action_found, 0.1),
+    `Dead ball before first action` = scales::percent(dead_ball_first, 0.1),
+    `Median Δ (s)` = median_delta,
+    `Transition, Δ ≤ 6 s` = scales::percent(le6, 0.1),
+    `Transition, Δ ≤ 8 s` = scales::percent(le8, 0.1),
+    `Transition, Δ ≤ 9 s` = scales::percent(le9, 0.1)
+  ) %>%
+  pivot_longer(-Season, names_to = "Check", values_transform = as.character) %>%
+  pivot_wider(names_from = Season) %>%
+  knitr::kable()
+```
+
+## Time to the first action after an opponent's made basket
+
+```{r}
+#| label: fig-delta
+#| fig-cap: "Seconds of game clock from the opponent's made field goal to the first action. Dashed lines: 6, 8 and 9 s."
+#| fig-width: 9
+#| fig-height: 4.5
+mk %>%
+  filter(!is.na(delta)) %>%
+  ggplot(aes(delta)) +
+  geom_histogram(binwidth = 1, boundary = -0.5, fill = "grey60", colour = "white") +
+  geom_vline(aes(xintercept = cut, colour = main),
+             data = tibble(cut = c(6.5, 8.5, 9.5), main = c(FALSE, TRUE, FALSE)),
+             linetype = "dashed", show.legend = FALSE) +
+  scale_colour_manual(values = c(`FALSE` = "grey40", `TRUE` = "black")) +
+  facet_wrap(~season) +
+  labs(x = "Δ (seconds)", y = "Possessions") +
+  theme_classic(base_size = 13)
+```
+
+## Team-season time to the first action
+
+```{r}
+#| label: tbl-team-delta
+#| tbl-cap: "Mean Δ after an opponent's made field goal, by team-season (no exclusions yet). Five fastest and five slowest per season."
+team_delta <- mk %>%
+  filter(!is.na(delta)) %>%
+  group_by(season, team = offense) %>%
+  summarise(mean_delta = mean(delta), share_le12 = mean(delta <= 12), n = n(), .groups = "drop") %>%
+  group_by(season) %>%
+  mutate(rank = rank(mean_delta)) %>%
+  filter(rank <= 5 | rank > n() - 5) %>%
+  arrange(season, mean_delta) %>%
+  ungroup()
+team_delta %>%
+  transmute(Season = season, Rank = rank, Team = team,
+            `Mean Δ (s)` = round(mean_delta, 1),
+            `Share Δ ≤ 12 s` = scales::percent(share_le12, 1),
+            Possessions = n) %>%
+  knitr::kable()
+```

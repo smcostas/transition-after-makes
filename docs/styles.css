@@ -1,0 +1,45 @@
+/* Neutral report styling: one accent colour, readable widths, quiet tables. */
+:root {
+  --accent: #1f5f8b;
+  --muted: #5f6b76;
+}
+
+body {
+  font-size: 1.02rem;
+}
+
+h1.title {
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.subtitle {
+  color: var(--muted);
+}
+
+.disclaimer {
+  font-size: 0.85rem;
+  color: var(--muted);
+  border-left: 3px solid #d0d7de;
+  padding-left: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.headline-number {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.callout-tip .callout-title-container {
+  font-weight: 700;
+}
+
+table {
+  font-size: 0.92rem;
+}
+
+figure figcaption, .figure-caption {
+  color: var(--muted);
+  font-size: 0.88rem;
+}

@@ -1,0 +1,331 @@
+[
+  {
+    "objectID": "data-notes.html",
+    "href": "data-notes.html",
+    "title": "Data validation notes",
+    "section": "",
+    "text": "Exploratory check of the two raw sources before writing the tested functions (Task 3). Raw data: shufinskiy/nba_data, pbpstats (one row per video event inside a possession) and nbastats (one row per play-by-play event)."
+  },
+  {
+    "objectID": "data-notes.html#what-the-data-contain",
+    "href": "data-notes.html#what-the-data-contain",
+    "title": "Data validation notes",
+    "section": "What the data contain",
+    "text": "What the data contain\n\npbpstats has no offense column, only OPPONENT (the defense). The offense is the other team of the game.\nRows are events, not possessions: possessions are recovered with distinct().\nClocks are text, minutes:seconds remaining in the period, as MM:SS in pbpstats and M:SS in nbastats.\nThere is no free-throw column. Points come from the change in score differential between a possession and the next one.\nPossessions have start and end times but no time of the first action. \\(\\Delta\\) comes from joining the nbastats events inside the possession’s time window: the first field-goal attempt or turnover by the offense, or shooting foul by the defense.\nStart types of possessions after a made field goal are split by zone: Off At Rim Make, Off Arc 3 Make, Off Corner 3 Make, Off Short Mid-Range Make, Off Long Mid-Range Make."
+  },
+  {
+    "objectID": "data-notes.html#checks",
+    "href": "data-notes.html#checks",
+    "title": "Data validation notes",
+    "section": "Checks",
+    "text": "Checks\n\n\n\n\nTable 1: Validation checks by season (before exclusions)\n\n\n\n\n\n\nCheck\n2023-24\n2024-25\n\n\n\n\nGames\n1228\n1230\n\n\nPossessions\n242365\n243782\n\n\nNext possession is the other team\n99.2%\n99.2%\n\n\nPoints agree with made FG (no FTs)\n99.5%\n99.6%\n\n\nAfter opponent made FG\n88055\n87432\n\n\nFirst action found\n98.2%\n98.3%\n\n\nDead ball before first action\n8.3%\n8.1%\n\n\nMedian Δ (s)\n16\n16\n\n\nTransition, Δ ≤ 6 s\n2.3%\n2.7%\n\n\nTransition, Δ ≤ 8 s\n5.7%\n6.7%\n\n\nTransition, Δ ≤ 9 s\n8.4%\n9.9%"
+  },
+  {
+    "objectID": "data-notes.html#time-to-the-first-action-after-an-opponents-made-basket",
+    "href": "data-notes.html#time-to-the-first-action-after-an-opponents-made-basket",
+    "title": "Data validation notes",
+    "section": "Time to the first action after an opponent’s made basket",
+    "text": "Time to the first action after an opponent’s made basket\n\n\n\n\n\n\n\n\nFigure 1: Seconds of game clock from the opponent’s made field goal to the first action. Dashed lines: 6, 8 and 9 s."
+  },
+  {
+    "objectID": "data-notes.html#team-season-time-to-the-first-action",
+    "href": "data-notes.html#team-season-time-to-the-first-action",
+    "title": "Data validation notes",
+    "section": "Team-season time to the first action",
+    "text": "Team-season time to the first action\n\n\n\n\nTable 2: Mean Δ after an opponent’s made field goal, by team-season (no exclusions yet). Five fastest and five slowest per season.\n\n\n\n\n\n\nSeason\nRank\nTeam\nMean Δ (s)\nShare Δ ≤ 12 s\nPossessions\n\n\n\n\n2023-24\n1\nIND\n14.9\n35%\n2988\n\n\n2023-24\n2\nSAC\n15.1\n34%\n2882\n\n\n2023-24\n3\nSAS\n15.3\n31%\n3063\n\n\n2023-24\n4\nWAS\n15.4\n30%\n3085\n\n\n2023-24\n5\nTOR\n15.8\n29%\n3043\n\n\n2023-24\n26\nORL\n17.1\n20%\n2707\n\n\n2023-24\n27\nMIN\n17.4\n16%\n2679\n\n\n2023-24\n28\nLAC\n17.6\n15%\n2815\n\n\n2023-24\n29\nDEN\n17.7\n17%\n2749\n\n\n2023-24\n30\nNYK\n18.1\n16%\n2705\n\n\n2024-25\n1\nCHI\n14.2\n41%\n3095\n\n\n2024-25\n2\nATL\n14.2\n41%\n2962\n\n\n2024-25\n3\nMEM\n14.4\n39%\n2861\n\n\n2024-25\n4\nCLE\n15.0\n35%\n2854\n\n\n2024-25\n5\nOKC\n15.3\n29%\n2600\n\n\n2024-25\n26\nBKN\n17.2\n21%\n2722\n\n\n2024-25\n27\nBOS\n17.2\n19%\n2838\n\n\n2024-25\n28\nORL\n17.6\n19%\n2616\n\n\n2024-25\n29\nNYK\n17.8\n19%\n2893\n\n\n2024-25\n30\nLAC\n17.9\n16%\n2700"
+  },
+  {
+    "objectID": "decisions.html",
+    "href": "decisions.html",
+    "title": "Decision log",
+    "section": "",
+    "text": "Every definition in this project was a choice. This log records each one: the question, the options, the evidence, and where the decision came from. Basketball marks decisions that came from how the game is played; Statistics marks decisions driven by the data or the model. All numbers below are computed from the data when this page is rendered (NBA regular seasons 2023-24 and 2024-25); see Data notes for the validation of the raw sources."
+  },
+  {
+    "objectID": "decisions.html#only-possessions-after-a-made-field-goal-not-after-a-made-free-throw",
+    "href": "decisions.html#only-possessions-after-a-made-field-goal-not-after-a-made-free-throw",
+    "title": "Decision log",
+    "section": "1.1 Only possessions after a made field goal, not after a made free throw",
+    "text": "1.1 Only possessions after a made field goal, not after a made free throw\nOrigin: rules. After a made field goal the game clock keeps running during the inbound; after a free throw it is stopped until the inbound is touched (NBA Rule 5). Time to the first action would include the inbound in one case and not in the other, so only made field goals are used."
+  },
+  {
+    "objectID": "decisions.html#intention-is-a-continuous-pace-not-a-fast-break-count",
+    "href": "decisions.html#intention-is-a-continuous-pace-not-a-fast-break-count",
+    "title": "Decision log",
+    "section": "1.2 Intention is a continuous pace, not a fast-break count",
+    "text": "1.2 Intention is a continuous pace, not a fast-break count\nOrigin: Basketball, confirmed by the data. The first definition was the FIBA fast-break rule (first action within 8 s). It turned out to describe a fast break, not the decision to push: a team that pushes after a make usually ends in early offense, around 8–12 s, and a push that the defense stops looks like any long possession.\n\n\n\n\nTable 1: Share of possessions after a made field goal by time to first action\n\n\n\n\n\n\nSeason\nΔ ≤ 8 s (FIBA fast break)\nΔ ≤ 12 s\nMedian Δ (s)\n\n\n\n\n2023-24\n4.5%\n21.7%\n16\n\n\n2024-25\n5.6%\n24.4%\n16\n\n\n\n\n\n\n\n\n\n\n\n\nTable 2: Team-seasons differ by about 4 seconds in their average pace after makes\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nSeason\nFastest\nFastest Δ (s)\nSlowest\nSlowest Δ (s)\nRange of share Δ ≤ 12 s\n\n\n\n\n2023-24\nIND\n15.0\nNYK\n18.5\n13% to 35%\n\n\n2024-25\nATL\n14.3\nLAC\n18.2\n14% to 40%\n\n\n\n\n\n\n\n\nWith only about 5% of possessions as strict fast breaks, a per-game fast-break rate would rest on about two possessions. The average time to the first action uses every possession and separates teams clearly. Decision: intention is the team-game average time to the first action, with no cut-off fixed in advance."
+  },
+  {
+    "objectID": "decisions.html#the-inbound-is-part-of-pushing",
+    "href": "decisions.html#the-inbound-is-part-of-pushing",
+    "title": "Decision log",
+    "section": "1.3 The inbound is part of pushing",
+    "text": "1.3 The inbound is part of pushing\nOrigin: Basketball. The moment the ball is touched in bounds is not in any public data, so the inbound cannot be removed. It should not be: inbounding quickly is part of pushing. The part every team takes is a constant that cancels out of the within-team comparison."
+  },
+  {
+    "objectID": "decisions.html#time-to-first-action-not-possession-length",
+    "href": "decisions.html#time-to-first-action-not-possession-length",
+    "title": "Decision log",
+    "section": "1.4 Time to first action, not possession length",
+    "text": "1.4 Time to first action, not possession length\nOrigin: Statistics. Possession length is also available, but it grows with offensive rebounds and ends at the defensive rebound after a miss, which is sometimes logged late. It is kept as a robustness check."
+  },
+  {
+    "objectID": "decisions.html#the-last-54-seconds-of-quarters-13-are-excluded",
+    "href": "decisions.html#the-last-54-seconds-of-quarters-13-are-excluded",
+    "title": "Decision log",
+    "section": "2.1 The last 54 seconds of quarters 1–3 are excluded",
+    "text": "2.1 The last 54 seconds of quarters 1–3 are excluded\nOrigin: Basketball, confirmed by the data. Near the end of a quarter, teams shoot early to get a 2-for-1, hold for the last shot, or heave. Time to the first action then reflects the clock, not a choice to push.\n\n\n\n\nTable 3: Quarters 1-3: possessions that start in the last 54 seconds against the rest\n\n\n\n\n\n\n\n\n\n\n\n\nWindow\nPossessions\nMean Δ (s)\nFast breaks (Δ ≤ 8 s)\n\n\n\n\nLast 54 s of the quarter\n9186\n13.4\n26.1%\n\n\nRest of the quarter\n124261\n16.3\n5.4%"
+  },
+  {
+    "objectID": "decisions.html#the-last-200-of-the-4th-quarter-and-of-overtime-are-excluded",
+    "href": "decisions.html#the-last-200-of-the-4th-quarter-and-of-overtime-are-excluded",
+    "title": "Decision log",
+    "section": "2.2 The last 2:00 of the 4th quarter and of overtime are excluded",
+    "text": "2.2 The last 2:00 of the 4th quarter and of overtime are excluded\nOrigin: rules. The game clock stops after made baskets there, so the inbound is no longer inside the time to the first action."
+  },
+  {
+    "objectID": "decisions.html#garbage-time-follows-cleaning-the-glass-without-the-starters-condition",
+    "href": "decisions.html#garbage-time-follows-cleaning-the-glass-without-the-starters-condition",
+    "title": "Decision log",
+    "section": "2.3 Garbage time follows Cleaning the Glass, without the starters condition",
+    "text": "2.3 Garbage time follows Cleaning the Glass, without the starters condition\nOrigin: Statistics. The margin thresholds of Cleaning the Glass are applied (4th quarter only: 25, 20 and 10 points by time left). Its second condition, two or fewer starters on the floor, cannot be applied because the data have no lineups, so slightly more possessions are excluded."
+  },
+  {
+    "objectID": "decisions.html#three-analyses-full-close-and-first-quarter",
+    "href": "decisions.html#three-analyses-full-close-and-first-quarter",
+    "title": "Decision log",
+    "section": "3.1 Three analyses: full, close and first quarter",
+    "text": "3.1 Three analyses: full, close and first quarter\nOrigin: Basketball. Teams behind push to catch up and teams ahead slow down, so the score can drive pace. The same model is fitted on all possessions, on close possessions, and on first quarters only, where the game starts tied and the plan is not yet shaped by the score."
+  },
+  {
+    "objectID": "decisions.html#the-score-moves-the-pace-inside-every-team",
+    "href": "decisions.html#the-score-moves-the-pace-inside-every-team",
+    "title": "Decision log",
+    "section": "3.2 The score moves the pace, inside every team",
+    "text": "3.2 The score moves the pace, inside every team\nOrigin: Basketball, confirmed by the data. The first fit of the main model, on all possessions, gave a small negative return: in games where a team played faster than usual after makes, those possessions went slightly worse. Teams that are behind speed up to catch up, so the games that go badly are also the faster ones. That alone can produce a negative association.\n\n\n\n\nTable 4: Mean seconds to first action by score margin when the possession starts\n\n\n\n\n\n\nMargin at the start\nPossessions\nMean Δ (s)\n\n\n\n\nDown 10+\n27772\n16.0\n\n\nDown 5-9\n24693\n16.3\n\n\nDown 1-4\n29162\n16.6\n\n\nTied\n7097\n16.6\n\n\nUp 1-4\n21880\n16.6\n\n\nUp 5-9\n18165\n17.1\n\n\nUp 10+\n18164\n17.1\n\n\n\n\n\n\n\n\n\n\n\n\nTable 5: Within each team-season: games played faster than usual are games with a worse score\n\n\n\n\n\n\n\n\n\n\n\nTeam-seasons\nMedian correlation\nTeam-seasons with a negative correlation\n\n\n\n\n60\n-0.23\n58\n\n\n\n\n\n\n\n\nThe correlation cannot separate “behind, so faster” from “faster, it went wrong, so behind”: the margin at each possession already includes the earlier possessions. That is why the model is also fitted on close possessions and on first quarters, where the score has had little time to build up."
+  },
+  {
+    "objectID": "decisions.html#close-means-within-5-points-in-quarters-13",
+    "href": "decisions.html#close-means-within-5-points-in-quarters-13",
+    "title": "Decision log",
+    "section": "3.3 “Close” means within 5 points, in quarters 1–3",
+    "text": "3.3 “Close” means within 5 points, in quarters 1–3\nOrigin: Basketball, confirmed by the data. Close games are played slower near the end, long before the last two minutes.\n\n\n\n\nTable 6: Possessions that start within 5 points, by segment of the game\n\n\n\n\n\n\n\n\n\n\n\n\nSegment\nPossessions\nMean Δ (s)\nFast breaks (Δ ≤ 8 s)\n\n\n\n\nQuarters 1-3\n59009\n16.3\n5.1%\n\n\n4th quarter, 12:00-6:00\n5667\n17.8\n3.3%\n\n\n4th quarter, 6:00-2:00\n3302\n19.1\n1.8%\n\n\nOvertime\n438\n19.5\n0.9%\n\n\n\n\n\n\n\n\nKeeping the 4th quarter would make a game look slow partly because it was close at the end. “Close” is measured at the start of each possession, never by the final result: selecting games by how they ended would condition on the outcome."
+  },
+  {
+    "objectID": "decisions.html#net-points-the-cost-of-how-a-possession-ends",
+    "href": "decisions.html#net-points-the-cost-of-how-a-possession-ends",
+    "title": "Decision log",
+    "section": "4.1 Net points: the cost of how a possession ends",
+    "text": "4.1 Net points: the cost of how a possession ends\nOrigin: Basketball and Statistics. A turnover costs more than the points not scored: it hands the opponent a better possession. Each possession is charged with the value of the opponent’s next possession, estimated within the same season.\n\n\n\n\nTable 7: Points per possession, by how the possession started (all possessions of each season)\n\n\n\n\n\n\nOpponent’s possession starts after our…\n2023-24\n2024-25\n\n\n\n\ndead ball (incl. dead-ball turnover)\n1.12\n1.13\n\n\nlive-ball turnover (steal)\n1.34\n1.33\n\n\nmade field goal\n1.14\n1.13\n\n\nmissed shot\n1.19\n1.19\n\n\n\n\n\n\n\n\nA live-ball turnover hands the opponent about 0.2 points more than a made basket does. That is the cost the net points charge."
+  },
+  {
+    "objectID": "decisions.html#the-games-average-pace-is-a-noisy-measurement",
+    "href": "decisions.html#the-games-average-pace-is-a-noisy-measurement",
+    "title": "Decision log",
+    "section": "5.1 The game’s average pace is a noisy measurement",
+    "text": "5.1 The game’s average pace is a noisy measurement\nOrigin: Statistics. A team-game has about 30 possessions after a made basket, and time to the first action varies a lot within a game. Its average is therefore measured with error.\n\n\n\n\nTable 8: How much of the game-to-game variation in pace is measurement noise\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nSeason\nPossessions per team-game\nWithin-game SD of Δ (s)\nStandard error of a game’s mean (s)\nSD of game means (s)\nShare of variance that is noise\n\n\n\n\n2023-24\n30.0\n5.04\n0.93\n1.42\n43%\n\n\n2024-25\n29.8\n5.16\n0.96\n1.59\n36%\n\n\n\n\n\n\n\n\nUsing the observed average directly as a predictor would bias the estimated return towards zero. Decision: the true pace of each game is a latent parameter, measured by the observed average with this known error."
+  },
+  {
+    "objectID": "decisions.html#team-game-likelihood",
+    "href": "decisions.html#team-game-likelihood",
+    "title": "Decision log",
+    "section": "5.2 Team-game likelihood",
+    "text": "5.2 Team-game likelihood\nOrigin: Statistics. Net points per 100 of a team-game are an average of about 30 possessions, close to normal by the central limit theorem, with a spread that shrinks with the number of possessions. A possession-level model is a planned extension."
+  },
+  {
+    "objectID": "decisions.html#every-quantity-is-paired-with-its-own-season",
+    "href": "decisions.html#every-quantity-is-paired-with-its-own-season",
+    "title": "Decision log",
+    "section": "6.1 Every quantity is paired with its own season",
+    "text": "6.1 Every quantity is paired with its own season\nOrigin: Basketball. Rosters and coaches change between seasons and within them. The unit is the team-season, and no number from one season is used to describe or adjust another."
+  },
+  {
+    "objectID": "decisions.html#is-descriptive-only-in-this-version",
+    "href": "decisions.html#is-descriptive-only-in-this-version",
+    "title": "Decision log",
+    "section": "6.2 2025-26 is descriptive only in this version",
+    "text": "6.2 2025-26 is descriptive only in this version\nOrigin: data availability. Possession-level data for 2025-26 are not in the public dump used here. The season of Miami’s change of pace after Jimmy Butler’s departure is described with team totals from pbpstats.com; adding it to the model needs a possession parser for the new play-by-play format, planned as the first update."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Pushing after the opponent scores barely matters, once you take the score out",
+    "section": "",
+    "text": "Independent analysis using public data, presented as an example case; not affiliated with the NBA or any of its teams. Reasoning behind every choice: decision log. Full model: formulation."
+  },
+  {
+    "objectID": "index.html#strict-fast-breaks-are-rare-after-a-made-basket",
+    "href": "index.html#strict-fast-breaks-are-rare-after-a-made-basket",
+    "title": "Pushing after the opponent scores barely matters, once you take the score out",
+    "section": "Strict fast breaks are rare after a made basket",
+    "text": "Strict fast breaks are rare after a made basket\n\n\n\n\n\n\n\n\nFigure 1: Seconds of game clock from the opponent’s made field goal to the first action. The dashed line is the FIBA fast-break limit (8 s).\n\n\n\n\n\nOnly 5% of these possessions are fast breaks in the FIBA sense. Pushing after a make usually ends in early offense, so intention is measured as a continuous pace, not as a count of fast breaks."
+  },
+  {
+    "objectID": "index.html#teams-have-a-pace-identity-after-makes",
+    "href": "index.html#teams-have-a-pace-identity-after-makes",
+    "title": "Pushing after the opponent scores barely matters, once you take the score out",
+    "section": "Teams have a pace identity after makes",
+    "text": "Teams have a pace identity after makes\n\n\n\n\n\n\n\n\nFigure 2: Average seconds to first action after the opponent scores, by team-season. Colour: overall pace (possessions per game, all situations).\n\n\n\n\n\nUsual paces span about four seconds across team-seasons, from about 14.3 to 18.5 seconds. Teams that push after makes tend to play fast overall too, but not always."
+  },
+  {
+    "objectID": "index.html#teams-stick-to-their-pace-from-game-to-game",
+    "href": "index.html#teams-stick-to-their-pace-from-game-to-game",
+    "title": "Pushing after the opponent scores barely matters, once you take the score out",
+    "section": "Teams stick to their pace from game to game",
+    "text": "Teams stick to their pace from game to game\n\n\n\n\n\n\n\n\nFigure 3: Average seconds to first action in each game (dots) for eight team-seasons of 2024-25, from the fastest to the slowest. Diamonds: season average.\n\n\n\n\n\nPart of the game-to-game scatter is noise from averaging about 30 possessions. Once the model separates it, a team’s true pace moves about 0.70 s from game to game, while usual paces differ across teams by about 0.95 s: roughly 64% of the variation in a game’s pace is who the team is."
+  },
+  {
+    "objectID": "index.html#the-score-moves-the-pace",
+    "href": "index.html#the-score-moves-the-pace",
+    "title": "Pushing after the opponent scores barely matters, once you take the score out",
+    "section": "The score moves the pace",
+    "text": "The score moves the pace\n\n\n\n\n\n\n\n\nFigure 4: Average seconds to first action by score margin when the possession starts (offense’s point of view).\n\n\n\n\n\nTeams behind push to catch up and teams ahead slow down. So a naive comparison mixes the choice to push with the score. The model is therefore fitted three times: on all possessions, on close games (quarters 1-3, within 5 points) and on first quarters, where the game starts tied."
+  },
+  {
+    "objectID": "index.html#is-it-different-for-some-teams",
+    "href": "index.html#is-it-different-for-some-teams",
+    "title": "Pushing after the opponent scores barely matters, once you take the score out",
+    "section": "Is it different for some teams?",
+    "text": "Is it different for some teams?\n\n\n\n\n\n\n\n\nFigure 6: Return of each team-season in the three analyses (median and 80% interval). Intervals overlap almost completely.\n\n\n\n\n\nNo team-season’s return can be told apart from the league value: estimates are pulled towards a common value and their intervals overlap. This is not proof that returns are identical; the data cannot say how much they really vary (in close games the spread across teams, sigma_beta, has a 90% interval of 0.1 to 6.1 net points per 100 per second)."
+  },
+  {
+    "objectID": "index.html#how-big-is-it",
+    "href": "index.html#how-big-is-it",
+    "title": "Pushing after the opponent scores barely matters, once you take the score out",
+    "section": "How big is it?",
+    "text": "How big is it?\n\n\n\n\nTable 2: The mean return in game terms. A typical game moves about tau seconds away from the team’s usual pace.\n\n\n\n\n\n\n\n\n\n\n\n\n\nAnalysis\nReturn (per 100, per second)\nTypical game-to-game change in pace (s)\nNet points per game in a typical game\nWins if played 1 s faster all season (extrapolation)\n\n\n\n\nAll possessions\n-1.4\n0.70\n-0.29\n-0.9\n\n\nClose games\n2.1\n0.61\n0.16\n0.6\n\n\nFirst quarters\n3.3\n0.55\n0.16\n0.7\n\n\n\n\n\n\n\n\nEven in close games the effect is a fraction of a point per game. The last column (posterior median, wins per point of margin averaged over the two seasons) extrapolates beyond what teams actually do, a whole second faster every game, and is shown only to give a sense of scale."
+  },
+  {
+    "objectID": "formulation.html",
+    "href": "formulation.html",
+    "title": "Transition after an opponent’s made basket: model formulation",
+    "section": "",
+    "text": "After the opponent scores, an NBA offense can inbound and attack before the defense is set, or walk the ball up and run its half-court offense. Possessions that start after an opponent’s made basket are the most common and the slowest type of possession, and teams differ in how often they try to push them.\nPushing has an obvious upside, attacking a defense that is not set, and a cost that is easy to overlook: rushed decisions lead to turnovers, and a live-ball turnover hands the opponent one of the most valuable possessions in basketball. The question this project asks is:\n\nWhen a team pushes the ball in transition after an opponent’s made basket, what is it worth, once the cost of turnovers is accounted for, and how does that vary across teams?\n\nTwo quantities answer it, for each team-season:\n\nLevel: how productive a team’s possessions after an opponent’s made basket are, net of turnover cost, relative to the league in the same season.\nReturn: within the same team-season, whether games in which the team pushes more are games in which those possessions are more productive.\n\n\n\nThe data are observational. Teams choose when to push, and the same factors that drive that choice (personnel, opponent, score) also affect how well possessions go. The model estimates adjusted associations, not the causal effect of pushing. Wherever the text says a team “gains” or “loses” by pushing, it means the association the model estimates, with the uncertainty the posterior reports.\n\n\n\nThis version covers NBA regular seasons 2023-24 and 2024-25. It does not model which kinds of transition possessions work (shot quality, who brings the ball up); that is a later layer."
+  },
+  {
+    "objectID": "formulation.html#what-this-analysis-does-not-claim",
+    "href": "formulation.html#what-this-analysis-does-not-claim",
+    "title": "Transition after an opponent’s made basket: model formulation",
+    "section": "",
+    "text": "The data are observational. Teams choose when to push, and the same factors that drive that choice (personnel, opponent, score) also affect how well possessions go. The model estimates adjusted associations, not the causal effect of pushing. Wherever the text says a team “gains” or “loses” by pushing, it means the association the model estimates, with the uncertainty the posterior reports."
+  },
+  {
+    "objectID": "formulation.html#scope",
+    "href": "formulation.html#scope",
+    "title": "Transition after an opponent’s made basket: model formulation",
+    "section": "",
+    "text": "This version covers NBA regular seasons 2023-24 and 2024-25. It does not model which kinds of transition possessions work (shot quality, who brings the ball up); that is a later layer."
+  },
+  {
+    "objectID": "formulation.html#transition-after-an-opponents-made-basket",
+    "href": "formulation.html#transition-after-an-opponents-made-basket",
+    "title": "Transition after an opponent’s made basket: model formulation",
+    "section": "2.1 Transition after an opponent’s made basket",
+    "text": "2.1 Transition after an opponent’s made basket\nOfficial definitions of transition do not use a clock. They describe a possession that ends before the defense is set, after a change of possession (Synergy Sports, n.d.; FIBA 2024). The FIBA Statisticians’ Manual lists a made field goal as a valid change of possession, so a team that pushes after conceding a basket is playing in transition in the strict sense. The FIBA manual is also the only official source found that puts a number on it: fast-break points are scored quickly, within a maximum of 8 seconds, before the defense is set (FIBA 2024).\nThe NBA publishes no time threshold. Its play-by-play has a fastbreak qualifier assigned by the scorer, with no published rule, so it cannot serve as the definition here.\n\n\n\nTable 1: Core definitions\n\n\n\n\n\n\n\n\n\n\nTerm\nDefinition\nSource\n\n\n\n\nUniverse\nPossessions that start after the opponent’s made field goal\n—\n\n\n\\(\\Delta\\)\nSeconds of game clock from the opponent’s made basket to the first possession-defining action: a field-goal attempt, a shooting foul drawn, or a turnover\n—\n\n\nInbound\nIncluded in \\(\\Delta\\): outside the last 2:00 of the 4th quarter and overtime, the game clock keeps running after a made field goal\nNBA Rule 5 §V.2(b) (NBA, n.d.b)\n\n\nFast break (descriptive only)\n\\(\\Delta \\le 8\\) s and no dead ball (timeout, non-shooting foul, violation, substitution) before the first action\nFIBA 2024 §2.4 (FIBA 2024); NBA 8-second backcourt rule, Rule 10 §VIII (NBA, n.d.a)"
+  },
+  {
+    "objectID": "formulation.html#why-intention-is-measured-in-seconds-without-a-cut-off",
+    "href": "formulation.html#why-intention-is-measured-in-seconds-without-a-cut-off",
+    "title": "Transition after an opponent’s made basket: model formulation",
+    "section": "2.2 Why intention is measured in seconds, without a cut-off",
+    "text": "2.2 Why intention is measured in seconds, without a cut-off\nThe FIBA threshold describes a fast break, not the decision to push. In the data, only about 5% of possessions after an opponent’s made field goal reach their first action within 8 s (Data notes, Decision log). A team that pushes after a make usually ends up in early offense, with a first action somewhere around 8–12 s, and a push that the defense stops ends as a long possession that the play-by-play cannot tell apart from walking the ball up.\nSo intention is not classified possession by possession. It is measured, for each team-game, as how fast the team gets to its first action after an opponent’s made basket, in seconds, as a continuous quantity. A team that pushes as a rule has a lower average \\(\\Delta\\) even when some of its pushes are stopped. No cut-off is fixed in advance; where the value of a possession changes with \\(\\Delta\\) is shown descriptively in the report. The FIBA definition is kept only to describe how rare a strict fast break is after a made basket.\nThe inbound is included on purpose. The moment the ball is touched in bounds is not recorded in any public data, so it could not be removed anyway; more importantly, inbounding quickly is part of pushing. The part of the inbound that every team takes is a constant that shifts the scale but cancels out of the return, because pace is centred within each team-season.\nTime to the first action is preferred to possession length, which is also available: possession length grows with offensive rebounds and ends at the defensive rebound after a miss, which is sometimes logged late. Possession length is used as a robustness check.\nPossessions that start after a made free throw are left out on purpose. After a free throw the game clock is stopped and only restarts when the inbound is touched (NBA, n.d.b), so \\(\\Delta\\) would exclude the inbound for those possessions and include it for all others. Keeping one start type makes \\(\\Delta\\) mean the same thing everywhere."
+  },
+  {
+    "objectID": "formulation.html#exclusions",
+    "href": "formulation.html#exclusions",
+    "title": "Transition after an opponent’s made basket: model formulation",
+    "section": "2.3 Exclusions",
+    "text": "2.3 Exclusions\n\n\n\nTable 2: Exclusions\n\n\n\n\n\n\n\n\n\n\nRule\nWhy\nSource\n\n\n\n\nPossessions that start in the last 2:00 of the 4th quarter or of any overtime\nThe game clock stops after made baskets, so \\(\\Delta\\) no longer includes the inbound and is not comparable\nNBA Rule 5 (NBA, n.d.b)\n\n\nPossessions that start with 54 s or less left in quarters 1–3\nClock management drives the pace: teams speed up to get a 2-for-1 and hold for the last shot. In the data, mean \\(\\Delta\\) drops from 16.3 s to 14.0 s and the share of fast breaks rises from 5% to 22% in that window\nThis project; covers the end-of-quarter heaves that Cleaning the Glass excludes (Cleaning the Glass, n.d.)\n\n\nGarbage time: 4th quarter only, margin \\(\\ge 25\\) with 12:00–9:00 left, \\(\\ge 20\\) with 9:00–6:00 left, \\(\\ge 10\\) with under 6:00 left\nOutcomes no longer reflect how teams play when the game is at stake\nCleaning the Glass (Cleaning the Glass, n.d.)\n\n\n\n\n\n\nDeviation from the source. Cleaning the Glass also requires two or fewer starters on the floor combined. The data used here have no lineups, so only the margin rule is applied. This classifies somewhat more late-game possessions as garbage time than Cleaning the Glass would."
+  },
+  {
+    "objectID": "formulation.html#known-data-limitations",
+    "href": "formulation.html#known-data-limitations",
+    "title": "Transition after an opponent’s made basket: model formulation",
+    "section": "2.4 Known data limitations",
+    "text": "2.4 Known data limitations\n\nPlay-by-play timestamps are whole seconds, so \\(\\Delta\\) has a resolution of one second.\nDefensive rebounds are sometimes logged 1–3 s late (Beuoy 2020), which can shift \\(\\Delta\\) for possessions that involve them.\nAbout 2% of possessions have no first action that can be matched in the event data; they are dropped and counted.\nAbout 8% have a dead ball before the first action, so their \\(\\Delta\\) does not reflect an uninterrupted possession. The main analysis keeps them; a robustness check drops them."
+  },
+  {
+    "objectID": "formulation.html#net-points-of-a-possession",
+    "href": "formulation.html#net-points-of-a-possession",
+    "title": "Transition after an opponent’s made basket: model formulation",
+    "section": "4.1 Net points of a possession",
+    "text": "4.1 Net points of a possession\nPoints scored are only half of what a possession is worth. How it ends decides what the opponent gets next: a made basket gives them an inbound against a set defense, a live-ball turnover gives them a possession that often starts with an open floor. The net points of possession \\(i\\) subtract the expected value of the opponent’s next possession:\n\\[\n\\text{net}_i = \\text{pts}_i - v_{s}(e_i),\n\\]\nwhere \\(v_s(e)\\) is the league-average points per possession of possessions that start with type \\(e\\) in season \\(s\\). The values \\(v_s(e)\\) are estimated from the data of season \\(s\\) only; they are not taken from published figures or from the other season."
+  },
+  {
+    "objectID": "formulation.html#team-game-summaries",
+    "href": "formulation.html#team-game-summaries",
+    "title": "Transition after an opponent’s made basket: model formulation",
+    "section": "4.2 Team-game summaries",
+    "text": "4.2 Team-game summaries\nFor team-game \\(k\\), with \\(n_k\\) possessions in the universe:\n\\[\n\\bar\\Delta_k = \\frac{1}{n_k}\\sum_{i:\\,k[i]=k} \\Delta_i\n\\qquad\\qquad\ny_k = \\frac{100}{n_k}\\sum_{i:\\,k[i]=k} \\text{net}_i\n\\]\n\n\\(\\bar\\Delta_k\\) is the observed pace after makes: the team’s average time to its first action after an opponent’s made basket in that game. Lower means more pushing. It is computed over all those possessions, including pushes that came to nothing.\n\\(y_k\\) is the team’s net points per 100 of those possessions in that game.\n\nIntention is latent. \\(\\bar\\Delta_k\\) is an average of about 30 possessions, so it measures the pace a team chose that night with error. The model treats the true pace \\(\\mu_k\\) as a parameter and \\(\\bar\\Delta_k\\) as a noisy measurement of it, with a standard error that follows from the within-game spread of \\(\\Delta\\) and \\(n_k\\) (the exact form is set in Part B). Ignoring that error would shrink the estimated return towards zero.\nMeasuring intention per team-game, instead of comparing short possessions with long ones, avoids the most direct form of self-selection: a possession is short because an open shot appeared, so short possessions look good by construction."
+  },
+  {
+    "objectID": "formulation.html#level-and-return",
+    "href": "formulation.html#level-and-return",
+    "title": "Transition after an opponent’s made basket: model formulation",
+    "section": "4.3 Level and return",
+    "text": "4.3 Level and return\nFor team-season \\(t\\):\n\nLevel \\(\\lambda_t\\): the expected \\(y_k\\) of team-season \\(t\\), minus the league average of \\(y_k\\) in the same season, at the team-season’s own average pace after makes. Units: net points per 100 possessions after an opponent’s made basket, relative to the league.\nReturn \\(\\beta_t\\): the change in expected \\(y_k\\) when the team plays one second faster after makes than its own season average, that is, when \\(\\mu_k - \\bar\\mu_t = -1\\). Because the pace is centred within the team-season, \\(\\beta_t\\) compares the team with itself from game to game, which keeps much of the difference in talent between teams out of the comparison (not all of it, see Limitations).\n\nBoth are posterior distributions, not point estimates. Every statement in the report quotes an interval."
+  },
+  {
+    "objectID": "formulation.html#wins-equivalent",
+    "href": "formulation.html#wins-equivalent",
+    "title": "Transition after an opponent’s made basket: model formulation",
+    "section": "4.4 Wins equivalent",
+    "text": "4.4 Wins equivalent\nTo translate the level into the units a front office uses:\n\\[\nW_t = \\frac{\\lambda_t}{100} \\times \\bar n_t \\times 82 \\times w_{s[t]},\n\\]\nwhere \\(\\bar n_t\\) is the average number of possessions after an opponent’s made basket per game for team-season \\(t\\), and \\(w_s\\) is the number of wins associated with one point of average per-game scoring margin, estimated by regressing win percentage on scoring margin across the team-seasons of season \\(s\\) only. \\(W_t\\) is computed for every posterior draw, so it carries the model’s uncertainty, but not the uncertainty in \\(w_s\\)."
+  },
+  {
+    "objectID": "formulation.html#teams-named-in-the-report",
+    "href": "formulation.html#teams-named-in-the-report",
+    "title": "Transition after an opponent’s made basket: model formulation",
+    "section": "4.5 Teams named in the report",
+    "text": "4.5 Teams named in the report\nThe report names teams only when the posterior supports it.\n\nQuadrants cross intention (team-season average pace after makes, faster or slower than the league median of the same season) with level (\\(\\lambda_t\\) above or below 0). For each quadrant, the team-season with the highest posterior probability of being in it is named.\nReturn: the team-seasons with the largest and the smallest \\(\\beta_t\\) are named.\nA team-season whose 95% interval for the relevant quantity includes 0 is not named as an extreme."
+  },
+  {
+    "objectID": "formulation.html#symbols",
+    "href": "formulation.html#symbols",
+    "title": "Transition after an opponent’s made basket: model formulation",
+    "section": "6.1 Symbols",
+    "text": "6.1 Symbols\n\n\n\nTable 6: Model symbols\n\n\n\n\n\n\n\n\n\n\nSymbol\nType\nMeaning\n\n\n\n\n\\(n_k\\)\nData\nPossessions after an opponent’s made field goal in team-game \\(k\\)\n\n\n\\(\\bar\\Delta_k\\)\nData\nMean seconds to the first action in \\(k\\)\n\n\n\\(s_s\\)\nData\nWithin-game standard deviation of those seconds, pooled over season \\(s\\)\n\n\n\\(y_k\\)\nData\nNet points per 100 possessions in \\(k\\)\n\n\n\\(\\text{home}_k\\)\nData\n1 if the team plays at home\n\n\n\\(t[k], o[k], s[k]\\)\nData (indices)\nTeam-season, opponent team-season and season of \\(k\\)\n\n\n\\(\\mu_k\\)\nLatent parameter\nTrue pace the team chose that night\n\n\n\\(m_t\\)\nParameter\nUsual pace of team-season \\(t\\)\n\n\n\\(\\tau\\)\nParameter\nGame-to-game variation of the true pace\n\n\n\\(\\alpha_s\\)\nParameter\nLeague average in season \\(s\\)\n\n\n\\(a_t\\)\nParameter\nLevel of team-season \\(t\\) (\\(= \\lambda_t\\))\n\n\n\\(\\beta_t\\)\nParameter\nReturn: net points per 100 per second faster than the team’s usual pace\n\n\n\\(b_o\\)\nParameter\nEffect of the opponent team-season’s defense\n\n\n\\(h\\)\nParameter\nHome advantage\n\n\n\\(\\sigma\\)\nParameter\nStandard deviation of the net points of one possession\n\n\n\\(\\bar\\beta, \\sigma_\\beta\\)\nHyperparameters\nMean and spread of returns across team-seasons\n\n\n\\(\\gamma, \\sigma_a\\)\nHyperparameters\nBetween-team association of usual pace with level, and spread of levels\n\n\n\\(\\bar m_s, \\sigma_m\\)\nHyperparameters\nLeague mean pace in season \\(s\\) and spread of usual paces\n\n\n\\(\\sigma_b\\)\nHyperparameter\nSpread of opponent effects\n\n\n\\(\\eta_k\\)\nDerived\nExpected net points per 100 in \\(k\\)\n\n\n\\(W_t\\)\nDerived\nWins equivalent"
+  },
+  {
+    "objectID": "formulation.html#submodel-1-intention-pace-after-makes",
+    "href": "formulation.html#submodel-1-intention-pace-after-makes",
+    "title": "Transition after an opponent’s made basket: model formulation",
+    "section": "6.2 Submodel 1: intention (pace after makes)",
+    "text": "6.2 Submodel 1: intention (pace after makes)\nStochastic component. The observed mean \\(\\bar\\Delta_k\\) is an average of \\(n_k\\) possessions whose times to first action spread with a within-game standard deviation of about 5 s. Its standard error is \\(s_{s[k]}/\\sqrt{n_k}\\) (about 0.9 s with all possessions, about 1.4 s in the close analysis), which is treated as known. \\(s_s\\) is the within-game standard deviation pooled over season \\(s\\), not each game’s own: in the close and first-quarter analyses some team-games have only one or two possessions, and their own standard deviation is undefined or unreliable.\n\\[\n\\bar\\Delta_k \\sim \\text{Normal}\\left(\\mu_k,\\ s_{s[k]}/\\sqrt{n_k}\\right)\n\\]\nHierarchy. The true pace of each game is drawn around the team-season’s usual pace, and usual paces around the league mean of the season:\n\\[\n\\mu_k \\sim \\text{Normal}\\left(m_{t[k]},\\ \\tau\\right)\n\\qquad\nm_t \\sim \\text{Normal}\\left(\\bar m_{s[t]},\\ \\sigma_m\\right)\n\\]\nIn the data, the game-to-game spread of \\(\\bar\\Delta_k\\) is about 1.5 s, so roughly 35-45% of its variance is measurement noise. Using \\(\\bar\\Delta_k\\) directly as a predictor would shrink the estimated return towards zero; using \\(\\mu_k\\) carries that noise into the uncertainty instead."
+  },
+  {
+    "objectID": "formulation.html#submodel-2-outcome-net-points",
+    "href": "formulation.html#submodel-2-outcome-net-points",
+    "title": "Transition after an opponent’s made basket: model formulation",
+    "section": "6.3 Submodel 2: outcome (net points)",
+    "text": "6.3 Submodel 2: outcome (net points)\nStochastic component. \\(y_k\\) is also an average of \\(n_k\\) possessions, so by the central limit theorem it is close to normal, with a standard deviation that shrinks with \\(n_k\\):\n\\[\ny_k \\sim \\text{Normal}\\left(\\eta_k,\\ \\sigma/\\sqrt{n_k}\\right)\n\\]\nA Student-\\(t\\) likelihood is kept as an alternative if posterior predictive checks show heavier tails than this allows.\nDeterministic component. The expected net points per 100 of team-game \\(k\\):\n\\[\n\\eta_k = \\alpha_{s[k]} + a_{t[k]} + \\beta_{t[k]}\\,\\big(m_{t[k]} - \\mu_k\\big) + b_{o[k]} + h\\cdot\\text{home}_k\n\\]\nThe predictor of the return is \\(m_{t[k]} - \\mu_k\\): how many seconds faster than its own usual pace the team played that night. Positive means faster.\nHierarchy.\n\\[\na_t \\sim \\text{Normal}\\left(\\gamma\\,\\big(\\bar m_{s[t]} - m_t\\big),\\ \\sigma_a\\right)\n\\qquad\n\\beta_t \\sim \\text{Normal}\\left(\\bar\\beta,\\ \\sigma_\\beta\\right)\n\\qquad\nb_o \\sim \\text{Normal}\\left(0,\\ \\sigma_b\\right)\n\\]"
+  },
+  {
+    "objectID": "formulation.html#within-and-between",
+    "href": "formulation.html#within-and-between",
+    "title": "Transition after an opponent’s made basket: model formulation",
+    "section": "6.4 Within and between",
+    "text": "6.4 Within and between\nThe model answers two different questions, side by side:\n\nWithin (\\(\\beta_t\\)): does this team gain when it plays faster than its own habit? The team is compared with itself, so its talent, roster and coach stay fixed. This is the more defensible comparison.\nBetween (\\(\\gamma\\)): do teams that habitually play faster after makes do better? This is the question behind the raw team-season scatter, adjusted for opponent and home court, but it remains exposed to differences in talent and roster between teams.\n\nThis is the classic within/between decomposition of multilevel models. The report presents \\(\\beta_t\\) as the main result and \\(\\gamma\\) as context."
+  },
+  {
+    "objectID": "formulation.html#what-controls-for-team-quality",
+    "href": "formulation.html#what-controls-for-team-quality",
+    "title": "Transition after an opponent’s made basket: model formulation",
+    "section": "6.5 What controls for team quality",
+    "text": "6.5 What controls for team quality\nNo extra covariate is needed, and none that pushing itself could affect is used: \\(a_t\\) absorbs everything that is fixed for a team within a season, \\(b_o\\) absorbs the opponent, and \\(h\\) the venue. All of them are season-specific."
+  },
+  {
+    "objectID": "formulation.html#connection-between-the-submodels",
+    "href": "formulation.html#connection-between-the-submodels",
+    "title": "Transition after an opponent’s made basket: model formulation",
+    "section": "6.6 Connection between the submodels",
+    "text": "6.6 Connection between the submodels\n\\(\\mu_k\\) is estimated from \\(\\bar\\Delta_k\\) and from the team’s usual pace \\(m_t\\) (a game with few possessions is pulled towards the team’s habit), and it enters \\(\\eta_k\\) through \\(m_{t[k]} - \\mu_k\\). All parameters are estimated jointly in a single fit, so the uncertainty about each game’s true pace propagates into \\(\\beta_t\\)."
+  },
+  {
+    "objectID": "formulation.html#prior-predictive-check",
+    "href": "formulation.html#prior-predictive-check",
+    "title": "Transition after an opponent’s made basket: model formulation",
+    "section": "7.1 Prior predictive check",
+    "text": "7.1 Prior predictive check\nTeam-games are simulated from the priors alone (no data), with 30 possessions each, a within-game standard deviation of time to first action of 5 s, and a home game half of the time. The simulated observed pace \\(\\bar\\Delta_k\\) and net points \\(y_k\\) should cover the range of the real data without being confined to it, and should not be absurd (negative seconds, thousands of points).\n\n\n\n\n\n\n\n\nFigure 2: Simulated from the priors (purple) against the observed team-games (grey). 4,000 draws.\n\n\n\n\n\n\n\n\n\nTable 7: Range of the prior predictive draws\n\n\n\n\nRange of the prior predictive draws\n\n\nPace: 1% and 99% (s)\nPace below 0 s\nNet per 100: 1% and 99%\n\n\n\n\n7.1 to 24.8\n0.0%\n-70 to 74"
+  }
+]

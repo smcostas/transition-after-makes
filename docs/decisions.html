@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2026-10-26">
+
+<title>Decision log – Pushing after the opponent scores</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-dfb324f25d9b1687192fa8be62ac8f9c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Pushing after the opponent scores</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Report</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./decisions.html" aria-current="page"> 
+<span class="menu-text">Decision log</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./formulation.html"> 
+<span class="menu-text">Model formulation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./data-notes.html"> 
+<span class="menu-text">Data notes</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/smcostas/transition-after-makes"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#what-counts-as-pushing-after-a-make" id="toc-what-counts-as-pushing-after-a-make" class="nav-link active" data-scroll-target="#what-counts-as-pushing-after-a-make"><span class="header-section-number">1</span> What counts as “pushing after a make”</a>
+  <ul class="collapse">
+  <li><a href="#only-possessions-after-a-made-field-goal-not-after-a-made-free-throw" id="toc-only-possessions-after-a-made-field-goal-not-after-a-made-free-throw" class="nav-link" data-scroll-target="#only-possessions-after-a-made-field-goal-not-after-a-made-free-throw"><span class="header-section-number">1.1</span> Only possessions after a made field goal, not after a made free throw</a></li>
+  <li><a href="#intention-is-a-continuous-pace-not-a-fast-break-count" id="toc-intention-is-a-continuous-pace-not-a-fast-break-count" class="nav-link" data-scroll-target="#intention-is-a-continuous-pace-not-a-fast-break-count"><span class="header-section-number">1.2</span> Intention is a continuous pace, not a fast-break count</a></li>
+  <li><a href="#the-inbound-is-part-of-pushing" id="toc-the-inbound-is-part-of-pushing" class="nav-link" data-scroll-target="#the-inbound-is-part-of-pushing"><span class="header-section-number">1.3</span> The inbound is part of pushing</a></li>
+  <li><a href="#time-to-first-action-not-possession-length" id="toc-time-to-first-action-not-possession-length" class="nav-link" data-scroll-target="#time-to-first-action-not-possession-length"><span class="header-section-number">1.4</span> Time to first action, not possession length</a></li>
+  </ul></li>
+  <li><a href="#when-the-clock-not-the-team-sets-the-pace" id="toc-when-the-clock-not-the-team-sets-the-pace" class="nav-link" data-scroll-target="#when-the-clock-not-the-team-sets-the-pace"><span class="header-section-number">2</span> When the clock, not the team, sets the pace</a>
+  <ul class="collapse">
+  <li><a href="#the-last-54-seconds-of-quarters-13-are-excluded" id="toc-the-last-54-seconds-of-quarters-13-are-excluded" class="nav-link" data-scroll-target="#the-last-54-seconds-of-quarters-13-are-excluded"><span class="header-section-number">2.1</span> The last 54 seconds of quarters 1–3 are excluded</a></li>
+  <li><a href="#the-last-200-of-the-4th-quarter-and-of-overtime-are-excluded" id="toc-the-last-200-of-the-4th-quarter-and-of-overtime-are-excluded" class="nav-link" data-scroll-target="#the-last-200-of-the-4th-quarter-and-of-overtime-are-excluded"><span class="header-section-number">2.2</span> The last 2:00 of the 4th quarter and of overtime are excluded</a></li>
+  <li><a href="#garbage-time-follows-cleaning-the-glass-without-the-starters-condition" id="toc-garbage-time-follows-cleaning-the-glass-without-the-starters-condition" class="nav-link" data-scroll-target="#garbage-time-follows-cleaning-the-glass-without-the-starters-condition"><span class="header-section-number">2.3</span> Garbage time follows Cleaning the Glass, without the starters condition</a></li>
+  </ul></li>
+  <li><a href="#separating-the-score-from-the-choice-to-push" id="toc-separating-the-score-from-the-choice-to-push" class="nav-link" data-scroll-target="#separating-the-score-from-the-choice-to-push"><span class="header-section-number">3</span> Separating the score from the choice to push</a>
+  <ul class="collapse">
+  <li><a href="#three-analyses-full-close-and-first-quarter" id="toc-three-analyses-full-close-and-first-quarter" class="nav-link" data-scroll-target="#three-analyses-full-close-and-first-quarter"><span class="header-section-number">3.1</span> Three analyses: full, close and first quarter</a></li>
+  <li><a href="#the-score-moves-the-pace-inside-every-team" id="toc-the-score-moves-the-pace-inside-every-team" class="nav-link" data-scroll-target="#the-score-moves-the-pace-inside-every-team"><span class="header-section-number">3.2</span> The score moves the pace, inside every team</a></li>
+  <li><a href="#close-means-within-5-points-in-quarters-13" id="toc-close-means-within-5-points-in-quarters-13" class="nav-link" data-scroll-target="#close-means-within-5-points-in-quarters-13"><span class="header-section-number">3.3</span> “Close” means within 5 points, in quarters 1–3</a></li>
+  </ul></li>
+  <li><a href="#what-a-possession-is-worth" id="toc-what-a-possession-is-worth" class="nav-link" data-scroll-target="#what-a-possession-is-worth"><span class="header-section-number">4</span> What a possession is worth</a>
+  <ul class="collapse">
+  <li><a href="#net-points-the-cost-of-how-a-possession-ends" id="toc-net-points-the-cost-of-how-a-possession-ends" class="nav-link" data-scroll-target="#net-points-the-cost-of-how-a-possession-ends"><span class="header-section-number">4.1</span> Net points: the cost of how a possession ends</a></li>
+  </ul></li>
+  <li><a href="#measuring-intention-with-error" id="toc-measuring-intention-with-error" class="nav-link" data-scroll-target="#measuring-intention-with-error"><span class="header-section-number">5</span> Measuring intention with error</a>
+  <ul class="collapse">
+  <li><a href="#the-games-average-pace-is-a-noisy-measurement" id="toc-the-games-average-pace-is-a-noisy-measurement" class="nav-link" data-scroll-target="#the-games-average-pace-is-a-noisy-measurement"><span class="header-section-number">5.1</span> The game’s average pace is a noisy measurement</a></li>
+  <li><a href="#team-game-likelihood" id="toc-team-game-likelihood" class="nav-link" data-scroll-target="#team-game-likelihood"><span class="header-section-number">5.2</span> Team-game likelihood</a></li>
+  </ul></li>
+  <li><a href="#seasons" id="toc-seasons" class="nav-link" data-scroll-target="#seasons"><span class="header-section-number">6</span> Seasons</a>
+  <ul class="collapse">
+  <li><a href="#every-quantity-is-paired-with-its-own-season" id="toc-every-quantity-is-paired-with-its-own-season" class="nav-link" data-scroll-target="#every-quantity-is-paired-with-its-own-season"><span class="header-section-number">6.1</span> Every quantity is paired with its own season</a></li>
+  <li><a href="#is-descriptive-only-in-this-version" id="toc-is-descriptive-only-in-this-version" class="nav-link" data-scroll-target="#is-descriptive-only-in-this-version"><span class="header-section-number">6.2</span> 2025-26 is descriptive only in this version</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Decision log</h1>
+<p class="subtitle lead">How the analysis was defined, and the evidence behind each choice</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 26, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Every definition in this project was a choice. This log records each one: the question, the options, the evidence, and where the decision came from. <strong>Basketball</strong> marks decisions that came from how the game is played; <strong>Statistics</strong> marks decisions driven by the data or the model. All numbers below are computed from the data when this page is rendered (NBA regular seasons 2023-24 and 2024-25); see <a href="./data-notes.html">Data notes</a> for the validation of the raw sources.</p>
+<section id="what-counts-as-pushing-after-a-make" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> What counts as “pushing after a make”</h1>
+<section id="only-possessions-after-a-made-field-goal-not-after-a-made-free-throw" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="only-possessions-after-a-made-field-goal-not-after-a-made-free-throw"><span class="header-section-number">1.1</span> Only possessions after a made field goal, not after a made free throw</h2>
+<p><em>Origin: rules.</em> After a made field goal the game clock keeps running during the inbound; after a free throw it is stopped until the inbound is touched (NBA Rule 5). Time to the first action would include the inbound in one case and not in the other, so only made field goals are used.</p>
+</section>
+<section id="intention-is-a-continuous-pace-not-a-fast-break-count" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="intention-is-a-continuous-pace-not-a-fast-break-count"><span class="header-section-number">1.2</span> Intention is a continuous pace, not a fast-break count</h2>
+<p><em>Origin: Basketball, confirmed by the data.</em> The first definition was the FIBA fast-break rule (first action within 8 s). It turned out to describe a fast break, not the decision to push: a team that pushes after a make usually ends in early offense, around 8–12 s, and a push that the defense stops looks like any long possession.</p>
+<div class="cell">
+<div id="tbl-fastbreak" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-fastbreak-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Share of possessions after a made field goal by time to first action
+</figcaption>
+<div aria-describedby="tbl-fastbreak-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Season</th>
+<th style="text-align: left;">Δ ≤ 8 s (FIBA fast break)</th>
+<th style="text-align: left;">Δ ≤ 12 s</th>
+<th style="text-align: right;">Median Δ (s)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">2023-24</td>
+<td style="text-align: left;">4.5%</td>
+<td style="text-align: left;">21.7%</td>
+<td style="text-align: right;">16</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2024-25</td>
+<td style="text-align: left;">5.6%</td>
+<td style="text-align: left;">24.4%</td>
+<td style="text-align: right;">16</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="cell">
+<div id="tbl-team-range" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-team-range-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Team-seasons differ by about 4 seconds in their average pace after makes
+</figcaption>
+<div aria-describedby="tbl-team-range-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 18%">
+<col style="width: 10%">
+<col style="width: 18%">
+<col style="width: 31%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Season</th>
+<th style="text-align: left;">Fastest</th>
+<th style="text-align: right;">Fastest Δ (s)</th>
+<th style="text-align: left;">Slowest</th>
+<th style="text-align: right;">Slowest Δ (s)</th>
+<th style="text-align: left;">Range of share Δ ≤ 12 s</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">2023-24</td>
+<td style="text-align: left;">IND</td>
+<td style="text-align: right;">15.0</td>
+<td style="text-align: left;">NYK</td>
+<td style="text-align: right;">18.5</td>
+<td style="text-align: left;">13% to 35%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2024-25</td>
+<td style="text-align: left;">ATL</td>
+<td style="text-align: right;">14.3</td>
+<td style="text-align: left;">LAC</td>
+<td style="text-align: right;">18.2</td>
+<td style="text-align: left;">14% to 40%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>With only about 5% of possessions as strict fast breaks, a per-game fast-break rate would rest on about two possessions. The average time to the first action uses every possession and separates teams clearly. Decision: intention is the team-game average time to the first action, with no cut-off fixed in advance.</p>
+</section>
+<section id="the-inbound-is-part-of-pushing" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="the-inbound-is-part-of-pushing"><span class="header-section-number">1.3</span> The inbound is part of pushing</h2>
+<p><em>Origin: Basketball.</em> The moment the ball is touched in bounds is not in any public data, so the inbound cannot be removed. It should not be: inbounding quickly is part of pushing. The part every team takes is a constant that cancels out of the within-team comparison.</p>
+</section>
+<section id="time-to-first-action-not-possession-length" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="time-to-first-action-not-possession-length"><span class="header-section-number">1.4</span> Time to first action, not possession length</h2>
+<p><em>Origin: Statistics.</em> Possession length is also available, but it grows with offensive rebounds and ends at the defensive rebound after a miss, which is sometimes logged late. It is kept as a robustness check.</p>
+</section>
+</section>
+<section id="when-the-clock-not-the-team-sets-the-pace" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> When the clock, not the team, sets the pace</h1>
+<section id="the-last-54-seconds-of-quarters-13-are-excluded" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="the-last-54-seconds-of-quarters-13-are-excluded"><span class="header-section-number">2.1</span> The last 54 seconds of quarters 1–3 are excluded</h2>
+<p><em>Origin: Basketball, confirmed by the data.</em> Near the end of a quarter, teams shoot early to get a 2-for-1, hold for the last shot, or heave. Time to the first action then reflects the clock, not a choice to push.</p>
+<div class="cell">
+<div id="tbl-end-quarter" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-end-quarter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Quarters 1-3: possessions that start in the last 54 seconds against the rest
+</figcaption>
+<div aria-describedby="tbl-end-quarter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 35%">
+<col style="width: 17%">
+<col style="width: 15%">
+<col style="width: 31%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Window</th>
+<th style="text-align: right;">Possessions</th>
+<th style="text-align: right;">Mean Δ (s)</th>
+<th style="text-align: left;">Fast breaks (Δ ≤ 8 s)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Last 54 s of the quarter</td>
+<td style="text-align: right;">9186</td>
+<td style="text-align: right;">13.4</td>
+<td style="text-align: left;">26.1%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Rest of the quarter</td>
+<td style="text-align: right;">124261</td>
+<td style="text-align: right;">16.3</td>
+<td style="text-align: left;">5.4%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="the-last-200-of-the-4th-quarter-and-of-overtime-are-excluded" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="the-last-200-of-the-4th-quarter-and-of-overtime-are-excluded"><span class="header-section-number">2.2</span> The last 2:00 of the 4th quarter and of overtime are excluded</h2>
+<p><em>Origin: rules.</em> The game clock stops after made baskets there, so the inbound is no longer inside the time to the first action.</p>
+</section>
+<section id="garbage-time-follows-cleaning-the-glass-without-the-starters-condition" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="garbage-time-follows-cleaning-the-glass-without-the-starters-condition"><span class="header-section-number">2.3</span> Garbage time follows Cleaning the Glass, without the starters condition</h2>
+<p><em>Origin: Statistics.</em> The margin thresholds of Cleaning the Glass are applied (4th quarter only: 25, 20 and 10 points by time left). Its second condition, two or fewer starters on the floor, cannot be applied because the data have no lineups, so slightly more possessions are excluded.</p>
+</section>
+</section>
+<section id="separating-the-score-from-the-choice-to-push" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Separating the score from the choice to push</h1>
+<section id="three-analyses-full-close-and-first-quarter" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="three-analyses-full-close-and-first-quarter"><span class="header-section-number">3.1</span> Three analyses: full, close and first quarter</h2>
+<p><em>Origin: Basketball.</em> Teams behind push to catch up and teams ahead slow down, so the score can drive pace. The same model is fitted on all possessions, on close possessions, and on first quarters only, where the game starts tied and the plan is not yet shaped by the score.</p>
+</section>
+<section id="the-score-moves-the-pace-inside-every-team" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="the-score-moves-the-pace-inside-every-team"><span class="header-section-number">3.2</span> The score moves the pace, inside every team</h2>
+<p><em>Origin: Basketball, confirmed by the data.</em> The first fit of the main model, on all possessions, gave a small negative return: in games where a team played faster than usual after makes, those possessions went slightly worse. Teams that are behind speed up to catch up, so the games that go badly are also the faster ones. That alone can produce a negative association.</p>
+<div class="cell">
+<div id="tbl-pace-by-score" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-pace-by-score-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4: Mean seconds to first action by score margin when the possession starts
+</figcaption>
+<div aria-describedby="tbl-pace-by-score-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Margin at the start</th>
+<th style="text-align: right;">Possessions</th>
+<th style="text-align: right;">Mean Δ (s)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Down 10+</td>
+<td style="text-align: right;">27772</td>
+<td style="text-align: right;">16.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Down 5-9</td>
+<td style="text-align: right;">24693</td>
+<td style="text-align: right;">16.3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Down 1-4</td>
+<td style="text-align: right;">29162</td>
+<td style="text-align: right;">16.6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tied</td>
+<td style="text-align: right;">7097</td>
+<td style="text-align: right;">16.6</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Up 1-4</td>
+<td style="text-align: right;">21880</td>
+<td style="text-align: right;">16.6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Up 5-9</td>
+<td style="text-align: right;">18165</td>
+<td style="text-align: right;">17.1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Up 10+</td>
+<td style="text-align: right;">18164</td>
+<td style="text-align: right;">17.1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="cell">
+<div id="tbl-within-score" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-within-score-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;5: Within each team-season: games played faster than usual are games with a worse score
+</figcaption>
+<div aria-describedby="tbl-within-score-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 26%">
+<col style="width: 56%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Team-seasons</th>
+<th style="text-align: right;">Median correlation</th>
+<th style="text-align: right;">Team-seasons with a negative correlation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">-0.23</td>
+<td style="text-align: right;">58</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>The correlation cannot separate “behind, so faster” from “faster, it went wrong, so behind”: the margin at each possession already includes the earlier possessions. That is why the model is also fitted on close possessions and on first quarters, where the score has had little time to build up.</p>
+</section>
+<section id="close-means-within-5-points-in-quarters-13" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="close-means-within-5-points-in-quarters-13"><span class="header-section-number">3.3</span> “Close” means within 5 points, in quarters 1–3</h2>
+<p><em>Origin: Basketball, confirmed by the data.</em> Close games are played slower near the end, long before the last two minutes.</p>
+<div class="cell">
+<div id="tbl-close-segment" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-close-segment-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;6: Possessions that start within 5 points, by segment of the game
+</figcaption>
+<div aria-describedby="tbl-close-segment-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 34%">
+<col style="width: 17%">
+<col style="width: 15%">
+<col style="width: 31%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Segment</th>
+<th style="text-align: right;">Possessions</th>
+<th style="text-align: right;">Mean Δ (s)</th>
+<th style="text-align: left;">Fast breaks (Δ ≤ 8 s)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Quarters 1-3</td>
+<td style="text-align: right;">59009</td>
+<td style="text-align: right;">16.3</td>
+<td style="text-align: left;">5.1%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4th quarter, 12:00-6:00</td>
+<td style="text-align: right;">5667</td>
+<td style="text-align: right;">17.8</td>
+<td style="text-align: left;">3.3%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">4th quarter, 6:00-2:00</td>
+<td style="text-align: right;">3302</td>
+<td style="text-align: right;">19.1</td>
+<td style="text-align: left;">1.8%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Overtime</td>
+<td style="text-align: right;">438</td>
+<td style="text-align: right;">19.5</td>
+<td style="text-align: left;">0.9%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>Keeping the 4th quarter would make a game look slow partly because it was close at the end. “Close” is measured at the start of each possession, never by the final result: selecting games by how they ended would condition on the outcome.</p>
+</section>
+</section>
+<section id="what-a-possession-is-worth" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> What a possession is worth</h1>
+<section id="net-points-the-cost-of-how-a-possession-ends" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="net-points-the-cost-of-how-a-possession-ends"><span class="header-section-number">4.1</span> Net points: the cost of how a possession ends</h2>
+<p><em>Origin: Basketball and Statistics.</em> A turnover costs more than the points not scored: it hands the opponent a better possession. Each possession is charged with the value of the opponent’s next possession, estimated within the same season.</p>
+<div class="cell">
+<div id="tbl-next-value" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-next-value-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;7: Points per possession, by how the possession started (all possessions of each season)
+</figcaption>
+<div aria-describedby="tbl-next-value-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Opponent’s possession starts after our…</th>
+<th style="text-align: right;">2023-24</th>
+<th style="text-align: right;">2024-25</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">dead ball (incl.&nbsp;dead-ball turnover)</td>
+<td style="text-align: right;">1.12</td>
+<td style="text-align: right;">1.13</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">live-ball turnover (steal)</td>
+<td style="text-align: right;">1.34</td>
+<td style="text-align: right;">1.33</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">made field goal</td>
+<td style="text-align: right;">1.14</td>
+<td style="text-align: right;">1.13</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">missed shot</td>
+<td style="text-align: right;">1.19</td>
+<td style="text-align: right;">1.19</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>A live-ball turnover hands the opponent about 0.2 points more than a made basket does. That is the cost the net points charge.</p>
+</section>
+</section>
+<section id="measuring-intention-with-error" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Measuring intention with error</h1>
+<section id="the-games-average-pace-is-a-noisy-measurement" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="the-games-average-pace-is-a-noisy-measurement"><span class="header-section-number">5.1</span> The game’s average pace is a noisy measurement</h2>
+<p><em>Origin: Statistics.</em> A team-game has about 30 possessions after a made basket, and time to the first action varies a lot within a game. Its average is therefore measured with error.</p>
+<div class="cell">
+<div id="tbl-reliability" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-reliability-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;8: How much of the game-to-game variation in pace is measurement noise
+</figcaption>
+<div aria-describedby="tbl-reliability-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 5%">
+<col style="width: 17%">
+<col style="width: 16%">
+<col style="width: 24%">
+<col style="width: 14%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Season</th>
+<th style="text-align: right;">Possessions per team-game</th>
+<th style="text-align: right;">Within-game SD of Δ (s)</th>
+<th style="text-align: right;">Standard error of a game’s mean (s)</th>
+<th style="text-align: right;">SD of game means (s)</th>
+<th style="text-align: left;">Share of variance that is noise</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">2023-24</td>
+<td style="text-align: right;">30.0</td>
+<td style="text-align: right;">5.04</td>
+<td style="text-align: right;">0.93</td>
+<td style="text-align: right;">1.42</td>
+<td style="text-align: left;">43%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2024-25</td>
+<td style="text-align: right;">29.8</td>
+<td style="text-align: right;">5.16</td>
+<td style="text-align: right;">0.96</td>
+<td style="text-align: right;">1.59</td>
+<td style="text-align: left;">36%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>Using the observed average directly as a predictor would bias the estimated return towards zero. Decision: the true pace of each game is a latent parameter, measured by the observed average with this known error.</p>
+</section>
+<section id="team-game-likelihood" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="team-game-likelihood"><span class="header-section-number">5.2</span> Team-game likelihood</h2>
+<p><em>Origin: Statistics.</em> Net points per 100 of a team-game are an average of about 30 possessions, close to normal by the central limit theorem, with a spread that shrinks with the number of possessions. A possession-level model is a planned extension.</p>
+</section>
+</section>
+<section id="seasons" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Seasons</h1>
+<section id="every-quantity-is-paired-with-its-own-season" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="every-quantity-is-paired-with-its-own-season"><span class="header-section-number">6.1</span> Every quantity is paired with its own season</h2>
+<p><em>Origin: Basketball.</em> Rosters and coaches change between seasons and within them. The unit is the team-season, and no number from one season is used to describe or adjust another.</p>
+</section>
+<section id="is-descriptive-only-in-this-version" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="is-descriptive-only-in-this-version"><span class="header-section-number">6.2</span> 2025-26 is descriptive only in this version</h2>
+<p><em>Origin: data availability.</em> Possession-level data for 2025-26 are not in the public dump used here. The season of Miami’s change of pace after Jimmy Butler’s departure is described with team totals from pbpstats.com; adding it to the model needs a possession parser for the new play-by-play format, planned as the first update.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Independent analysis using public data, presented as an example case; not affiliated with the NBA or any of its teams.</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
